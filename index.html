@@ -21,10 +21,10 @@
   .screen{height:calc(100vh - var(--hdr));padding:0}
 
   /* Side-by-side stage */
-  .stage{height:100%;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .stage{height:80%;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
 
   /* Left panel (text) */
-  .pane{height:100%;overflow:auto;background:rgba(17,24,39,.6);border:1px solid #1f2937;border-radius:0 0 0 0;padding:18px}
+  .pane{height:80%;overflow:auto;background:rgba(17,24,39,.6);border:1px solid #1f2937;border-radius:0 0 0 0;padding:18px}
   /* Give panel nice rounded corners on outer edges for large screens */
   @media (min-width:901px){
     .pane{border-radius:16px 0 0 16px}
@@ -45,8 +45,8 @@
   .c6{border-color:#22d3ee}      .c6:hover{background:rgba(34,211,238,.12)}
 
   /* Right media pane fills height with cover */
-  .mediaBox{height:70%;overflow:hidden;background:#0a0f1d;border:1px solid #1f2937}
-  .mediaBox img{width:70%;height:70%;object-fit:cover;display:block}
+  .mediaBox{height:80%;overflow:hidden;background:#0a0f1d;border:1px solid #1f2937}
+  .mediaBox img{width:80%;height:80%;object-fit:cover;display:block}
 
   /* Result / Summary cards use same visual as pane */
   .result,.summary{height:100%;overflow:auto;background:rgba(17,24,39,.6);border:1px solid #1f2937;border-radius:0 0 0 0;padding:18px}
@@ -558,6 +558,7 @@ function showEpisodeSummary(){
 </script>
 </body>
 </html>
+
 
 
 
