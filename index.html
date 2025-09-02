@@ -8,14 +8,21 @@
   :root{ --hdr:56px; }
 
   /* Base */
-  body {margin:0;background:#0b1020;color:#e5e7eb;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif}
-  .hidden{display:none}
+  body {
+    margin:0;
+    background:#0b1020;
+    color:#e5e7eb;
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;
+
+    /* (optional) if you meant to scale the whole app */
     transform: scale(0.85);
     transform-origin: top left;
     width: 117.65vw;
     height: 117.65vh;
     overflow: hidden;
   }
+  .hidden{display:none}
+
   /* Header (fixed height for viewport math) */
   header{position:sticky;top:0;background:rgba(2,6,23,.75);backdrop-filter:blur(8px);border-bottom:1px solid rgba(148,163,184,.25);z-index:5}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;height:var(--hdr);display:flex;justify-content:space-between;align-items:center}
@@ -61,6 +68,10 @@
   .good{color:#22c55e;font-weight:800}
   .bad{color:#f87171;font-weight:800}
   .warn{color:#94a3b8;margin:.5rem 0 0 1rem}
+
+  /* Remove bullets on result warnings & summary list */
+  #resultWarn, #summaryList { list-style-type:none; padding-left:0; margin-left:0; }
+
   .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
   .btn{background:linear-gradient(90deg,#60a5fa,#3b82f6);color:#fff;border:0;padding:.8rem 1rem;border-radius:10px;font-weight:800;cursor:pointer}
   .ghost{background:transparent;color:#e5e7eb;border:1px solid rgba(148,163,184,.45);padding:.8rem 1rem;border-radius:10px;font-weight:700;cursor:pointer}
@@ -72,23 +83,22 @@
     font-size:18px; line-height:1.6;
   }
   h2{font-size:22px} h3{font-size:20px}
- 
+
   /* Responsive (mobile): stack vertically but still no page scroll
      - Media takes 45vh, text takes 55vh; each scrolls internally if needed */
-@media (max-width:900px){
-  /* Existing styles ... */
-  .stage{grid-template-columns:1fr;grid-template-rows:55vh 45vh}
-  .mediaBox{grid-row:2/3;border-radius:0}
-  .pane,.result,.summary{grid-row:1/2;border-radius:0}
-  
-  /* Reduce font size for mobile */
-  body, h1, h2, h3, h4, h5, h6,
-  p, span, div, button, input, select, textarea {
-    font-size:12px; /* Adjust as needed */
+  @media (max-width:900px){
+    .stage{grid-template-columns:1fr;grid-template-rows:55vh 45vh}
+    .mediaBox{grid-row:2/3;border-radius:0}
+    .pane,.result,.summary{grid-row:1/2;border-radius:0}
+
+    /* Reduce font size for mobile */
+    body, h1, h2, h3, h4, h5, h6,
+    p, span, div, button, input, select, textarea {
+      font-size:12px;
+    }
+    h2{font-size:13px}
+    h3{font-size:14px}
   }
-  h2{font-size:13px}
-  h3{font-size:14px}
-}
 </style>
 </head>
 <body>
@@ -164,7 +174,7 @@
     <div class="summary">
       <h3 id="summaryTitle">에피소드 요약</h3>
       <p id="summaryIntro"></p>
-      <ul id="summaryList" class="warn" style="margin-left:1rem"></ul>
+      <ul id="summaryList" class="warn"></ul>
       <div class="nav">
         <button class="ghost" onclick="go('menuScreen')">메인 메뉴로 돌아가기</button>
         <button class="btn" id="summaryNextButton">다음 에피소드</button>
@@ -187,7 +197,7 @@
       btn: "에피소드 1 — 시작",
       summaryMedia: "ep1_summary.png",
       lessons: [
-        "공개 정보와 평가 기준 외의 영향력 행사로 공정성을 저해하면 안되니다.",
+        "공개 정보와 평가 기준 외의 영향력 행사는 공정성을 저해합니다.",
         "상사의 비공식 지시에도 절차·기준을 우선해야 합니다.",
         "이해충돌 소지는 선제적으로 공개하고 회피해야 합니다."
       ],
@@ -198,9 +208,9 @@
           text: "퇴근 무렵 협력업체 담당자가 부탁한다. “이번 입찰에서 꼭 우리 회사가 선정되게 도와주세요, {{name}}님.” 잠시 흔들린다.",
           choices: [
             { text: "공고문에 나온 조건 외에는 영향 줄 수 없다고 설명하며 원칙을 지킨다.", correct: true,
-              feedback: { title:"좋은 선택", body:"공정성과 투명성을 우선했습니다.", warn:["비공개 정보를 귀띔해주거나 특정 업체에게 유리 조언을 해서는 안됩니다."] } },
+              feedback: { title:"좋은 선택", body:"공정성과 투명성을 우선했습니다.", warn:["비공개 정보를 귀띔해 주거나 특정 업체에 유리한 조언을 해서는 안 됩니다."] } },
             { text: "직접 도와줄 순 없지만, 심사위원들이 좋아할 만한 방향 정도는 귀띔해 준다.", correct: false,
-              feedback: { title:"잘못된 선택", body:"이런 선택은 사소해 보여도 공정성을 해칠 수 있습니다.", warn:["편파 유도, 공정성 저해를 방지해야 합니다."] } }
+              feedback: { title:"잘못된 선택", body:"사소해 보여도 공정성을 해칠 수 있습니다.", warn:["편파 유도와 공정성 저해를 방지해야 합니다."] } }
           ]
         },
         {
@@ -209,9 +219,9 @@
           text: "회의 후 상사가 말한다. “이번에는 ○○업체 좀 밀어주자, {{name}}.” 그대로 따를지 고민된다.",
           choices: [
             { text: "평가 기준과 절차를 따르는 게 회사에도 득이 된다고 조심스럽게 의견을 제시한다.", correct: true,
-              feedback:{ title:"좋은 선택", body:"절차 준수는 결과 신뢰를 높입니다.", warn:["부당한 지시 수용하거나, 기준과 절차에 반하는 개입을 해서는 안됩니다."]}},
+              feedback:{ title:"좋은 선택", body:"절차 준수는 결과 신뢰를 높입니다.", warn:["부당한 지시를 수용하거나 기준·절차에 반하는 개입을 해서는 안 됩니다."]}},
             { text: "일단 상사 뜻을 따르되, 문제가 커지지 않길 바라며 넘어간다.", correct:false,
-              feedback:{ title:"잘못된 선택", body:"묵인은 동조로 비칠 수 있습니다.", warn:["부당특혜, 편파평가가 있어서는 안됩니다."]}}
+              feedback:{ title:"잘못된 선택", body:"묵인은 동조로 비칠 수 있습니다.", warn:["부당 특혜와 편파 평가는 있어서는 안 됩니다."]}}
           ]
         },
         {
@@ -220,9 +230,9 @@
           text: "거래선 선택에 대한 심사를 하게 되었다. 그런데 심사받는 업체 중에 친형 소유의 회사가 보인다. “그런 사실을 굳이 알리지 않아도 되지 않을까, {{name}}?”",
           choices: [
             { text: "나의 이런 이해관계를 회사에 보고한다.", correct: true,
-              feedback:{ title:"좋은 선택", body:"이해충돌 우려를 사전에 차단했습니다.", warn:["이해관계를 은폐하거나 편파적으로 판단하면 안됩니다."]}},
-            { text: "나는 관련성이 크지 않고 여기고 알리지 않고 심사 작업에 참여한다.", correct:false,
-              feedback:{ title:"잘못된 선택", body:"사후 적발 시 전체 절차의 신뢰를 무너뜨릴 수 있습니다.", warn:["이해관계 은폐는 기준과 절차에 반하는 잘못된 결과로 이어집니다."]}}
+              feedback:{ title:"좋은 선택", body:"이해충돌 우려를 사전에 차단했습니다.", warn:["이해관계를 은폐하거나 편파적으로 판단하면 안 됩니다."]}},
+            { text: "나는 관련성이 크지 않다고 여기고 알리지 않고 심사 작업에 참여한다.", correct:false,
+              feedback:{ title:"잘못된 선택", body:"사후 적발 시 전체 절차의 신뢰를 무너뜨릴 수 있습니다.", warn:["이해관계 은폐는 기준과 절차에 반하는 결과로 이어질 수 있습니다."]}}
           ]
         }
       ]
@@ -233,9 +243,9 @@
       btn: "에피소드 2 — 시작",
       summaryMedia: "ep2_summary.png", 
       lessons: [
-        "형식이 아니라 실질 기준으로 ‘접대/향응’ 판단해야 합니다.",
-        "작은 선물도 누적·관행화 시 리스크가 급증하게 됩니다.",
-        "수령 전 회사 기준 확인·거절 의사를 명확히 해야 합니다."
+        "형식이 아니라 실질 기준으로 ‘접대/향응’을 판단해야 합니다.",
+        "작은 선물도 누적·관행화되면 리스크가 급증할 수 있습니다.",
+        "수령 전 회사 기준 확인 및 거절 의사를 명확히 해야 합니다."
       ],
       situations: [
         {
@@ -246,7 +256,7 @@
             { text:"회사 규정을 이유로 정중히 거절한다.", correct:true,
               feedback:{title:"좋은 선택", body:"사적 이해 유발 소지를 차단했습니다.", warn:["향응/접대 수수는 피해야 합니다."]}},
             { text:"공식적인 자리로 포장되었으니 참석한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"형식이 공적이어도 실질은 사적 제공일 수 있습니다.", warn:["이해충돌 유발이 발생할 수 있으므로 조심해야 합니다."]}}
+              feedback:{title:"잘못된 선택", body:"형식이 공적이어도 실질은 사적 제공일 수 있습니다.", warn:["이해충돌이 유발될 수 있으므로 주의해야 합니다."]}}
           ]
         },
         {
@@ -257,7 +267,7 @@
             { text:"받을 수 없음을 설명하고 돌려보낸다.", correct:true,
               feedback:{title:"좋은 선택", body:"업무 관련 금품 수수의 오해를 차단했습니다.", warn:["선물 수수는 정해진 기준과 절차에 따라야 합니다."]}},
             { text:"일단 받고 나중에 생각한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"“일단 수수”는 그 자체로 리스크가 됩니다.", warn:["금품 수수는 정해진 기준과 절차에 따라야 합니다."]}}
+              feedback:{title:"잘못된 선택", body:"‘일단 수수’는 그 자체로 리스크가 됩니다.", warn:["금품 수수는 정해진 기준과 절차에 따라야 합니다."]}}
           ]
         },
         {
@@ -266,9 +276,9 @@
           text: "동료가 속삭인다. “이 정도는 다 받아.” 선물을 받는 것이 맞는지 고민된다, {{name}}.",
           choices: [
             { text:"작은 것이라도 쌓이면 문제, 원칙을 지킨다.", correct:true,
-              feedback:{title:"좋은 선택", body:"관행이라도 기준을 낮추지 않았습니다.", warn:["관행이 규정에 어긋난다면 묵인해서는 안됩니다."]}},
+              feedback:{title:"좋은 선택", body:"관행이라도 기준을 낮추지 않았습니다.", warn:["관행이 규정에 어긋난다면 묵인해서는 안 됩니다."]}},
             { text:"분위기를 깨지 않으려 맞장구친다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"침묵·동조가 누적되면 반드시 큰 문제가 되고야 맙니다.", warn:["묵시적 동조도 동조입니다."]}}
+              feedback:{title:"잘못된 선택", body:"침묵·동조가 누적되면 큰 문제가 됩니다.", warn:["묵시적 동조도 동조입니다."]}}
           ]
         }
       ]
@@ -279,9 +289,9 @@
       btn: "에피소드 3 — 시작",
       summaryMedia: "ep3_summary.png", 
       lessons: [
-        "모욕/조롱은 즉시 중단 요청으로 2차 피해 차단해야 합니다.",
-        "사적 심부름 등 직무 외 지시는 시키지도 말아야 하며, 거절해야 합니다.",
-        "항상 모두를 존중하는 언어 원칙 유지해야 합니다."
+        "모욕·조롱은 즉시 중단을 요청해 2차 피해를 차단해야 합니다.",
+        "사적 심부름 등 직무 외 지시는 해서는 안 되며, 거절해야 합니다.",
+        "항상 모두를 존중하는 언어의 원칙을 유지해야 합니다."
       ],
       situations: [
         {
@@ -290,9 +300,9 @@
           text: "선배가 김신입 프로에게 욕설을 퍼붓는다. 모두가 시선을 피한다. {{name}}는 어떻게 할까?",
           choices: [
             { text:"명백한 괴롭힘이므로 제지한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"즉시 제지로 피해를 막았습니다.", warn:["인격 모독, 공개 망신은 명백히 괴롭힘입니다."]}},
+              feedback:{title:"좋은 선택", body:"즉시 제지로 피해를 막았습니다.", warn:["인격 모독과 공개 망신은 명백히 괴롭힘입니다."]}},
             { text:"침묵한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"방관은 괴롭힘을 지속시키는 요인이 됩니다.", warn:["방관, 묵인하면 안됩니다."]}}
+              feedback:{title:"잘못된 선택", body:"방관은 괴롭힘을 지속시키는 요인이 됩니다.", warn:["방관·묵인해서는 안 됩니다."]}}
           ]
         },
         {
@@ -301,9 +311,9 @@
           text: "퇴근 후 상사가 반복적으로 개인 심부름을 지시한다. 난감하다, {{name}}.",
           choices: [
             { text:"정중히 업무와 무관함을 말하고 거절한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"업무와 무관한 사적인 심부름은 지시하면 안됩니다.", warn:["사적 지시는 수용하지 말아야 합니다."]}},
+              feedback:{title:"좋은 선택", body:"업무와 무관한 사적인 심부름은 지시해서는 안 됩니다.", warn:["사적 지시는 수용하지 말아야 합니다."]}},
             { text:"그냥 해주며 넘긴다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"업무와 무관한 사적인 심부름은 지시하면 안됩니다.", warn:["업무 범위에서 벗어나는 일입니다."]}}
+              feedback:{title:"잘못된 선택", body:"한 번의 양보가 지속적 요구로 이어질 수 있습니다.", warn:["업무 범위를 벗어나는 일입니다."]}}
           ]
         },
         {
@@ -312,9 +322,9 @@
           text: "단체 채팅방에서 특정 직원을 조롱하는 글이 이어진다. 불편하다. {{name}}는?",
           choices: [
             { text:"그런 행동을 중단하라고 요구한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"직장내 괴롭힘을 방지했습니다.", warn:["동료에 대한 집단 조롱과 비하 표현을 방치하면 안됩니다."]}},
+              feedback:{title:"좋은 선택", body:"직장 내 괴롭힘을 방지했습니다.", warn:["동료에 대한 집단 조롱과 비하 표현을 방치하면 안 됩니다."]}},
             { text:"괜히 나섰다가 불편해질까봐 모른 척한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"침묵은 동조로 비칠 수 있습니다.", warn:["부디 괴롭힘 당하는 동료를 보고 침묵하지 말아주십시오."]}}
+              feedback:{title:"잘못된 선택", body:"침묵은 동조로 비칠 수 있습니다.", warn:["괴롭힘을 보고 침묵하지 마십시오."]}}
           ]
         }
       ]
@@ -325,8 +335,8 @@
       btn: "에피소드 4 — 시작",
       summaryMedia: "ep4_summary.png",
       lessons: [
-        "직무 관련 금품/향응은 오해와 리스크의 시작입니다.",
-        "입찰·제안 관련 정보는 사전 제공 금지되어 있습니다.",
+        "직무 관련 금품·향응은 오해와 리스크의 시작입니다.",
+        "입찰·제안 관련 정보는 사전 제공이 금지되어 있습니다.",
         "가격 합의 등 경쟁 제한 시도는 즉시 거절해야 합니다."
       ],
       situations: [
@@ -349,7 +359,7 @@
             { text:"공개할 수 없는 정보라며 선을 긋는다.", correct:true,
               feedback:{title:"좋은 선택", body:"불공정 입찰 시도를 차단했습니다.", warn:["내부 자료 유출에 주의해야 합니다."]}},
             { text:"일부라도 보여주면 내 입지에 도움 될까 고민된다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"부분 제공이라도 부당한 이익이 될 수 있습니다.", warn:["불공정하게 정보를 제공해서는 안됩니다."]}}
+              feedback:{title:"잘못된 선택", body:"부분 제공이라도 부당한 이익이 될 수 있습니다.", warn:["불공정하게 정보를 제공해서는 안 됩니다."]}}
           ]
         },
         {
@@ -358,9 +368,9 @@
           text: "동료가 귓속말한다. “업체랑 가격 좀 맞추자. 그래야 다 편하지 않겠어, {{name}}?”",
           choices: [
             { text:"즉시 잘못된 제안이라며 거부한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"경쟁 제한 시도를 단호히 차단했습니다.", warn:["경쟁사와 가격 합의 등 담합은 금지되어 있습니다."]}},
+              feedback:{title:"좋은 선택", body:"경쟁 제한 시도를 단호히 차단했습니다.", warn:["경쟁사와의 가격 합의 등 담합은 금지되어 있습니다."]}},
             { text:"다들 한다며 동의한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"담합 행위는 중대한 법 위반이며 회사·본인 모두에 큰 위험입니다.", warn:["경쟁 제한에 대한 담합은 금지되어 있습니다."]}}
+              feedback:{title:"잘못된 선택", body:"담합 행위는 중대한 법 위반이며 회사와 본인 모두에 큰 위험입니다.", warn:["경쟁 제한에 대한 담합은 금지되어 있습니다."]}}
           ]
         }
       ]
@@ -372,8 +382,8 @@
       summaryMedia: "ep5_summary.png",
       lessons: [
         "목적 달성 후 불필요한 개인정보는 즉시 파기해야 합니다.",
-        "물리적인 형태의 문서·매체를 방치하면 안되며, 즉시 회수·보관해야 합니다.",
-        "내부정보는 외부 공유 금지되어 있습니다."
+        "물리 문서·매체를 방치하면 안 되며, 즉시 회수·보관해야 합니다.",
+        "내부 정보는 외부 공유가 금지되어 있습니다."
       ],
       situations: [
         {
@@ -382,7 +392,7 @@
           text: "서버 정리를 하다 여러 해 전 저장된 다른 직원의 여권 사본을 발견한다. “보관해도 괜찮을까?” {{name}}는 고민한다.",
           choices: [
             { text:"개인 정보이니 즉시 파기해야 한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"개인정보보호법 위반이 허락하지 않은 개인 정보는 파기하는 것이 원칙입니다.", warn:["개인정보보호법 위반에 주의해야 합니다."]}},
+              feedback:{title:"좋은 선택", body:"개인정보보호법이 허용하지 않은 개인정보는 파기하는 것이 원칙입니다.", warn:["개인정보보호법 위반에 주의해야 합니다."]}},
             { text:"나중에 쓸 수도 있으니 그냥 둔다.", correct:false,
               feedback:{title:"잘못된 선택", body:"불필요한 개인정보의 보유는 개인정보보호법 위반이며, 유출·오남용의 출발점이 되기 쉽습니다.", warn:["개인정보보호법 위반에 주의해야 합니다."]}}
           ]
@@ -390,12 +400,12 @@
         {
           meta: "에피소드 5 · 상황 5-2 — 안전 관리",
           media: "situation_ep5_2.png",
-          text: "급히 나가다 대외비 정보가 포함된 문서를 회의실에 두고 나왔다. 외부인에게 노출될 수도 있는 상황이다, {{name}}.",
+          text: "급히 나가다 대외비 정보가 포함된 문서를 회의실에 두고 나왔다. 외부인에게 노출될 수도 있다, {{name}}.",
           choices: [
             { text:"즉시 회수하여 안전하게 보관한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"물리적 접근 차단이 가장 기본적인 보호조치입니다.", warn:["문서를 방치하면 누군가 무단 열람할지도 모릅니다. 가능"]}},
+              feedback:{title:"좋은 선택", body:"물리적 접근 차단이 가장 기본적인 보호 조치입니다.", warn:["문서를 방치하면 무단 열람될지도 모릅니다."]}},
             { text:"시간이 아까워 그냥 둔다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"짧은 방치도 유출·오해로 이어질 수 있습니다.", warn:["문서 관리에 소홀하면 안됩니다."]}}
+              feedback:{title:"잘못된 선택", body:"짧은 방치도 유출·오해로 이어질 수 있습니다.", warn:["문서 관리에 소홀하면 안 됩니다."]}}
           ]
         },
         {
@@ -403,8 +413,8 @@
           media: "situation_ep5_3.png",
           text: "친한 회사 밖 친구가 부탁한다. “회사 정보 좀 알려줄 수 있지? 경쟁사에서 정말 필요해.”, {{name}}.",
           choices: [
-            { text:"내부정보는 불가, 공개정보만 언급 또는 정중 거절한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"정보주체와 회사를 함께 보호했습니다.", warn:["내부 정보의 외부 제공하거나 목적외 이용하는 것은 금지되어 있습니다.]}},
+            { text:"내부 정보는 불가, 공개 정보만 언급하거나 정중히 거절한다.", correct:true,
+              feedback:{title:"좋은 선택", body:"정보주체와 회사를 함께 보호했습니다.", warn:["내부 정보의 외부 제공이나 목적 외 이용은 금지되어 있습니다."]}},
             { text:"비밀을 지킨다는 조건으로 내부 정보를 알려준다.", correct:false,
               feedback:{title:"잘못된 선택", body:"조건부라도 유출은 유출입니다.", warn:["기밀 유출은 반드시 방지해야 합니다."]}}
           ]
@@ -529,53 +539,36 @@
     nextBtn.textContent = (currentSituation < ep.situations.length - 1) ? '이 에피소드 다음 상황으로' : '에피소드 요약 보기';
   }
 
-function showEpisodeSummary(){
-  const ep = episodes[currentEpisode];
-  go('episodeSummaryScreen');
+  function showEpisodeSummary(){
+    const ep = episodes[currentEpisode];
+    go('episodeSummaryScreen');
 
-  // Prefer ep.summaryMedia; fallback to last situation image
-  const lastMedia = ep.situations[ep.situations.length - 1]?.media || '';
-  const sumMedia = ep.summaryMedia || lastMedia;
-  renderMediaInto('#summaryMediaRight', sumMedia, ep.title + ' 요약');
+    // Prefer ep.summaryMedia; fallback to last situation image
+    const lastMedia = ep.situations[ep.situations.length - 1]?.media || '';
+    const sumMedia = ep.summaryMedia || lastMedia;
+    renderMediaInto('#summaryMediaRight', sumMedia, ep.title + ' 요약');
 
-  // Text
-  $('#summaryTitle').textContent = ep.title + ' — 요약';
-  $('#summaryIntro').textContent = `${playerName}님, 이번 에피소드에서 기억할 점입니다:`;
+    // Text
+    $('#summaryTitle').textContent = ep.title + ' — 요약';
+    $('#summaryIntro').textContent = `${playerName}님, 이번 에피소드에서 기억할 점입니다:`;
 
-  const ul = $('#summaryList'); ul.innerHTML = '';
-  (ep.lessons || []).forEach(item => {
-    const li = document.createElement('li'); li.textContent = '' + item; ul.appendChild(li);
-  });
+    const ul = $('#summaryList'); ul.innerHTML = '';
+    (ep.lessons || []).forEach(item => {
+      const li = document.createElement('li'); li.textContent = '' + item; ul.appendChild(li);
+    });
 
-  const btn = $('#summaryNextButton');
-  if (currentEpisode < episodes.length - 1){
-    btn.textContent = '다음 에피소드';
-    btn.onclick = () => { currentEpisode++; currentSituation = 0; showSituation(); };
-  } else {
-    btn.textContent = '마지막 에피소드 완료';
-    btn.onclick = () => go('menuScreen');
+    const btn = $('#summaryNextButton');
+    if (currentEpisode < episodes.length - 1){
+      btn.textContent = '다음 에피소드';
+      btn.onclick = () => { currentEpisode++; currentSituation = 0; showSituation(); };
+    } else {
+      btn.textContent = '마지막 에피소드 완료';
+      btn.onclick = () => go('menuScreen');
+    }
   }
-}
-
 
   // Build menu on load
   (function init(){ renderNames(); buildEpisodeButtons(); })();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
