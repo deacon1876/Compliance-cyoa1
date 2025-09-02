@@ -72,7 +72,14 @@
     font-size:18px; line-height:1.6;
   }
   h2{font-size:22px} h3{font-size:20px}
-
+  
+/* Remove bullets from warnings and summaries */
+  #resultWarn,
+  #summaryList {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
   /* Responsive (mobile): stack vertically but still no page scroll
      - Media takes 45vh, text takes 55vh; each scrolls internally if needed */
 @media (max-width:900px){
@@ -563,6 +570,7 @@ function showEpisodeSummary(){
 </script>
 </body>
 </html>
+
 
 
 
