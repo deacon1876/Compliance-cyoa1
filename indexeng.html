@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Compliance Adventure — CYOA</title>
+<style>
+  :root{ --hdr:56px; }
+
+  /* Base */
+  body {
+    margin:0;
+    background:#0b1020;
+    color:#e5e7eb;
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;
+
+    /* (optional) if you meant to scale the whole app */
+    transform: scale(0.85);
+    transform-origin: top left;
+    width: 117.65vw;
+    height: 117.65vh;
+    overflow: hidden;
+  }
+  .hidden{display:none}
+
+  /* Header (fixed height for viewport math) */
+  header{position:sticky;top:0;background:rgba(2,6,23,.75);backdrop-filter:blur(8px);border-bottom:1px solid rgba(148,163,184,.25);z-index:5}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;height:var(--hdr);display:flex;justify-content:space-between;align-items:center}
+  .title{font-weight:800}
+  .pill{border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:.25rem .7rem;color:#94a3b8}
+
+  /* Screen takes exactly remaining viewport height (no page scroll) */
+  .screen{height:calc(100vh - var(--hdr));padding:0}
+
+  /* Side-by-side stage */
+  .stage{height:100%;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
+
+  /* Left panel (text) */
+  .pane{height:100%;overflow:auto;background:rgba(17,24,39,.6);border:1px solid #1f2937;border-radius:0 0 0 0;padding:18px}
+  /* Give panel nice rounded corners on outer edges for large screens */
+  @media (min-width:901px){
+    .pane{border-radius:16px 0 0 16px}
+    .mediaBox{border-radius:0 16px 16px 0}
+  }
+
+  .scene-meta{color:#94a3b8;margin-bottom:6px}
+  .choices{display:grid;gap:12px;margin-top:14px}
+  button.choice{appearance:none;background:rgba(255,255,255,.06);color:#e5e7eb;padding:14px;border-radius:12px;text-align:left;font-weight:700;cursor:pointer;transition:.15s ease;border:3px solid transparent}
+  button.choice:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+
+  /* Color cycle for borders */
+  .c1{border-color:#60a5fa}      .c1:hover{background:rgba(96,165,250,.12)}
+  .c2{border-color:#34d399}      .c2:hover{background:rgba(52,211,153,.12)}
+  .c3{border-color:#f59e0b}      .c3:hover{background:rgba(245,158,11,.12)}
+  .c4{border-color:#a78bfa}      .c4:hover{background:rgba(167,139,250,.12)}
+  .c5{border-color:#fb7185}      .c5:hover{background:rgba(251,113,133,.12)}
+  .c6{border-color:#22d3ee}      .c6:hover{background:rgba(34,211,238,.12)}
+
+  /* Right media pane fills height with cover */
+  .mediaBox{height:100%;overflow:hidden;background:#0a0f1d;border:1px solid #1f2937}
+  .mediaBox img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* Result / Summary cards use same visual as pane */
+  .result,.summary{height:100%;overflow:auto;background:rgba(17,24,39,.6);border:1px solid #1f2937;border-radius:0 0 0 0;padding:18px}
+  @media (min-width:901px){
+    .result,.summary{border-radius:16px 0 0 16px}
+  }
+  .good{color:#22c55e;font-weight:800}
+  .bad{color:#f87171;font-weight:800}
+  .warn{color:#94a3b8;margin:.5rem 0 0 1rem}
+
+  /* Remove bullets on result warnings & summary list */
+  #resultWarn, #summaryList { list-style-type:none; padding-left:0; margin-left:0; }
+
+  .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+  .btn{background:linear-gradient(90deg,#60a5fa,#3b82f6);color:#fff;border:0;padding:.8rem 1rem;border-radius:10px;font-weight:800;cursor:pointer}
+  .ghost{background:transparent;color:#e5e7eb;border:1px solid rgba(148,163,184,.45);padding:.8rem 1rem;border-radius:10px;font-weight:700;cursor:pointer}
+  .fullgrid{display:grid;gap:12px}
+
+  /* Unify font size */
+  body, h1, h2, h3, h4, h5, h6,
+  p, span, div, button, input, select, textarea {
+    font-size:18px; line-height:1.6;
+  }
+  h2{font-size:22px} h3{font-size:20px}
+
+  /* Responsive (mobile): stack vertically but still no page scroll
+     - Media takes 45vh, text takes 55vh; each scrolls internally if needed */
+  @media (max-width:900px){
+    .stage{grid-template-columns:1fr;grid-template-rows:55vh 45vh}
+    .mediaBox{grid-row:2/3;border-radius:0}
+    .pane,.result,.summary{grid-row:1/2;border-radius:0}
+
+    /* Reduce font size for mobile */
+    body, h1, h2, h3, h4, h5, h6,
+    p, span, div, button, input, select, textarea {
+      font-size:12px;
+    }
+    h2{font-size:13px}
+    h3{font-size:14px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="title">Compliance Event</div>
+    <div class="pill" id="crumb">Player: Player</div>
+  </div>
+</header>
+
+<!-- Start -->
+<section class="screen" id="startScreen">
+  <div class="stage">
+    <div class="pane" style="padding-top:22px;max-width:800px">
+      <h2>Get Started</h2>
+      <p>Enter your player name. If you continue without entering one, you’ll be shown as <span class="pname">Player</span>.</p>
+      <input id="playerNameInput" type="text" placeholder="e.g., Hong Gildong / Alex" style="width:90%;padding:12px 14px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:#0f172a;color:#e5e7eb;outline:none">
+      <div class="nav" style="justify-content:space-between">
+        <span style="color:#94a3b8">You can change the name later in the menu.</span>
+        <button class="btn" onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+    <div class="mediaBox"><img src="cover.png" alt="Game cover"></div>
+  </div>
+</section>
+
+<!-- Menu -->
+<section class="screen hidden" id="menuScreen">
+  <div class="stage">
+    <div class="pane" style="padding-top:22px;max-width:800px">
+      <h2>Select Episode</h2>
+      <p><span class="pname">Player</span>, please choose an episode.</p>
+      <div id="episodeButtons" class="fullgrid"></div>
+      <div class="nav" style="justify-content:flex-end"><button class="ghost" onclick="changeName()">Change Player Name</button></div>
+    </div>
+    <div class="mediaBox"><img src="menu_banner.png" alt="Return to main menu"></div>
+  </div>
+</section>
+
+<!-- Situation -->
+<section class="screen hidden" id="situationScreen">
+  <div class="stage">
+    <div class="pane">
+      <div class="scene-meta" id="sceneMeta"></div>
+      <h2 id="episodeTitle"></h2>
+      <p id="situationText"></p>
+      <div id="choices" class="choices"></div>
+    </div>
+    <div class="mediaBox" id="situationMediaRight"></div>
+  </div>
+</section>
+
+<!-- Result -->
+<section class="screen hidden" id="resultScreen">
+  <div class="stage">
+    <div class="result">
+      <h3 id="resultTitle"></h3>
+      <p id="resultText"></p>
+      <ul class="warn" id="resultWarn"></ul>
+      <div class="nav">
+        <button class="ghost" onclick="go('menuScreen')">Back to Main Menu</button>
+        <button class="btn" id="nextButton">Next</button>
+      </div>
+    </div>
+    <div class="mediaBox" id="resultMediaRight"></div>
+  </div>
+</section>
+
+<!-- Episode Summary -->
+<section class="screen hidden" id="episodeSummaryScreen">
+  <div class="stage">
+    <div class="summary">
+      <h3 id="summaryTitle">Episode Summary</h3>
+      <p id="summaryIntro"></p>
+      <ul id="summaryList" class="warn"></ul>
+      <div class="nav">
+        <button class="ghost" onclick="go('menuScreen')">Back to Main Menu</button>
+        <button class="btn" id="summaryNextButton">Next Episode</button>
+      </div>
+    </div>
+    <div class="mediaBox" id="summaryMediaRight"></div>
+  </div>
+</section>
+
+<script>
+  // ---------- State ----------
+  let playerName = 'Player';
+  let currentEpisode = 0;
+  let currentSituation = 0;
+
+  // ---------- Data ----------
+  const episodes = [
+    {
+      title: "Episode 1: Vendor Selection Process",
+      btn: "Episode 1 — Start",
+      summaryMedia: "ep1_summary.png",
+      lessons: [
+        "Influence outside public info and criteria undermines fairness.",
+        "Prioritize procedures and criteria even under informal orders from a superior.",
+        "Disclose and avoid any potential conflicts of interest in advance."
+      ],
+      situations: [
+        {
+          meta: "Episode 1 · Situation 1-1",
+          media: "situation_ep1_1.png",
+          text: "At the end of the day, a partner company rep asks for a favor. “Please help our company get selected in this bid, {{name}}.”",
+          choices: [
+            { text: "Explain you can’t influence beyond the RFP criteria and stick to principles.", correct: true,
+              feedback: { title:"Good Choice", body:"You prioritized fairness and transparency.", warn:["Do not tip off nonpublic info or give advice favoring a specific vendor."] } },
+            { text: "You can’t help directly, but hint at what evaluators might like.", correct: false,
+              feedback: { title:"Wrong Choice", body:"Even small actions can undermine fairness.", warn:["Avoid steering and unfairness."] } }
+          ]
+        },
+        {
+          meta: "Episode 1 · Situation 1-2",
+          media: "situation_ep1_2.png",
+          text: "After a meeting, your boss says, “Let’s push ○○ Company this time, {{name}}.” You’re unsure whether to comply.",
+          choices: [
+            { text: "Suggest that following criteria and procedures benefits the company, too.", correct: true,
+              feedback:{ title:"Good Choice", body:"Following procedure increases trust in the outcome.", warn:["Do not accept improper orders or intervene against standards/procedures."]}},
+            { text: "Go along for now and hope it doesn’t escalate.", correct:false,
+              feedback:{ title:"Wrong Choice", body:"Silence can be seen as agreement.", warn:["Improper favoritism and biased evaluation are unacceptable."]}}
+          ]
+        },
+        {
+          meta: "Episode 1 · Situation 1-3",
+          media: "situation_ep1_3.png",
+          text: "You’re assigned to evaluate vendors, and one of them is owned by your older brother. “Is it really necessary to disclose that, {{name}}?”",
+          choices: [
+            { text: "Report your conflict of interest to the company.", correct: true,
+              feedback:{ title:"Good Choice", body:"You prevented a conflict of interest in advance.", warn:["Do not conceal conflicts or judge with bias."]}},
+            { text: "Assume it’s minor and proceed without disclosing it.", correct:false,
+              feedback:{ title:"Wrong Choice", body:"If found later, it could invalidate the whole process.", warn:["Concealing conflicts may lead to results that violate standards and procedures."]}}
+          ]
+        }
+      ]
+    },
+
+    {
+      title: "Episode 2: Gifts and Hospitality",
+      btn: "Episode 2 — Start",
+      summaryMedia: "ep2_summary.png", 
+      lessons: [
+        "Judge “entertainment/hospitality” by substance, not form.",
+        "Even small gifts, if repeated or customary, can greatly increase risk.",
+        "Verify company policy before accepting; clearly refuse if in doubt."
+      ],
+      situations: [
+        {
+          meta: "Episode 2 · Situation 2-1",
+          media: "situation_ep2_1.png",
+          text: "“I’ve booked a great restaurant. Please join us.” You think, ‘This should be okay, right?’, {{name}}.",
+          choices: [
+            { text:"Decline politely, citing company policy.", correct:true,
+              feedback:{title:"Good Choice", body:"You blocked potential personal-influence risks.", warn:["Avoid receiving entertainment/hospitality."]}},
+            { text:"Attend since it’s framed as an official setting.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Even if it looks official, the substance may be private hospitality.", warn:["Be cautious since it can trigger a conflict of interest."]}}
+          ]
+        },
+        {
+          meta: "Episode 2 · Situation 2-2",
+          media: "situation_ep2_2.png",
+          text: "A client offers a fancy gift box. “Just a small token, {{name}}.” You worry declining might hurt the relationship.",
+          choices: [
+            { text:"Explain you can’t accept it and return it.", correct:true,
+              feedback:{title:"Good Choice", body:"You prevented suspicion of job-related gift receipt.", warn:["Gifts must follow defined rules and procedures."]}},
+            { text:"Accept now and think about it later.", correct:false,
+              feedback:{title:"Wrong Choice", body:"“Accept first” is a risk in itself.", warn:["Gifts must follow defined rules and procedures."]}}
+          ]
+        },
+        {
+          meta: "Episode 2 · Situation 2-3",
+          media: "situation_ep2_3.png",
+          text: "A coworker whispers, “Everyone accepts small stuff.” You’re unsure whether to take the gift, {{name}}.",
+          choices: [
+            { text:"Stick to principles; small things add up to big issues.", correct:true,
+              feedback:{title:"Good Choice", body:"You didn’t lower the bar just because ‘it’s customary.’", warn:["Do not condone customs that violate policy."]}},
+            { text:"Play along to keep the mood.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Silence/going along can accumulate into serious issues.", warn:["Tacit consent is still consent."]}}
+          ]
+        }
+      ]
+    },
+
+    {
+      title: "Episode 3: Responding to Workplace Harassment",
+      btn: "Episode 3 — Start",
+      summaryMedia: "ep3_summary.png", 
+      lessons: [
+        "Request an immediate stop to insults/mockery to prevent further harm.",
+        "Personal errands outside job scope should not be ordered; refuse them.",
+        "Always maintain respectful language in official channels."
+      ],
+      situations: [
+        {
+          meta: "Episode 3 · Situation 3-1",
+          media: "situation_ep3_1.png",
+          text: "A senior shouts abuse at Junior Kim. Everyone looks away. What will you do, {{name}}?",
+          choices: [
+            { text:"Stop it, as it’s clearly harassment.", correct:true,
+              feedback:{title:"Good Choice", body:"Immediate intervention prevented harm.", warn:["Personal insults and public shaming are clear harassment."]}},
+            { text:"Stay silent.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Bystanding enables harassment to continue.", warn:["Do not tolerate bystanding or tacit approval."]}}
+          ]
+        },
+        {
+          meta: "Episode 3 · Situation 3-2",
+          media: "situation_ep3_2.png",
+          text: "After hours, your boss repeatedly orders personal errands. You feel awkward, {{name}}.",
+          choices: [
+            { text:"Politely say it’s unrelated to your job and refuse.", correct:true,
+              feedback:{title:"Good Choice", body:"You set boundaries to prevent normalization of personal errands."}},
+            { text:"Just do it and move on.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Conceding once can lead to ongoing demands."}}
+          ]
+        },
+        {
+          meta: "Episode 3 · Situation 3-3",
+          media: "situation_ep3_3.png",
+          text: "In a group chat, people keep mocking a specific coworker. You feel uncomfortable. What do you do, {{name}}?",
+          choices: [
+            { text:"Ask them to stop that behavior.", correct:true,
+              feedback:{title:"Good Choice", body:"You helped prevent workplace harassment.", warn:["Do not tolerate group mockery and derogatory remarks."]}},
+            { text:"Ignore it to avoid awkwardness.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Silence can be seen as agreement.", warn:["Don’t stay silent when you see harassment."]}}
+          ]
+        }
+      ]
+    },
+
+    {
+      title: "Episode 4: Collusion and Improper Solicitation",
+      btn: "Episode 4 — Start",
+      summaryMedia: "ep4_summary.png",
+      lessons: [
+        "Job-related gifts/hospitality are the start of suspicion and risk.",
+        "Pre-bid/proposal information must not be provided in advance.",
+        "Refuse any attempt to restrict competition, such as price-fixing."
+      ],
+      situations: [
+        {
+          meta: "Episode 4 · Situation 4-1",
+          media: "situation_ep4_1.png",
+          text: "A vendor rep hands you concert tickets with a smile. “We look forward to working with you, {{name}}.”",
+          choices: [
+            { text:"Return them politely, saying you can’t accept personal benefits.", correct:true,
+              feedback:{title:"Good Choice", body:"You blocked personal interests from affecting judgment."}},
+            { text:"Accept them with thanks to avoid straining the relationship.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Gifts from job-related parties create suspicion and risk."}}
+          ]
+        },
+        {
+          meta: "Episode 4 · Situation 4-2",
+          media: "situation_ep4_2.png",
+          text: "An acquaintance says quietly, “We’ll help you next bid. Show us the proposal, {{name}}.”",
+          choices: [
+            { text:"Draw the line: the information isn’t discloseable.", correct:true,
+              feedback:{title:"Good Choice", body:"You stopped an attempt at unfair bidding.", warn:["Be careful not to leak internal materials."]}},
+            { text:"Wonder if showing part of it might help your standing.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Even partial disclosure can be an undue advantage.", warn:["Do not provide information unfairly."]}}
+          ]
+        },
+        {
+          meta: "Episode 4 · Situation 4-3",
+          media: "situation_ep4_3.png",
+          text: "A coworker whispers, “Let’s align prices with the vendor—it’ll make everyone’s life easier, {{name}}.”",
+          choices: [
+            { text:"Refuse immediately as an improper suggestion.", correct:true,
+              feedback:{title:"Good Choice", body:"You firmly blocked an attempt to restrict competition.", warn:["Collusion such as price agreements with competitors is prohibited."]}},
+            { text:"Agree since ‘everyone does it.’", correct:false,
+              feedback:{title:"Wrong Choice", body:"Cartel behavior is a serious legal violation, risking both the company and you.", warn:["Collusion restricting competition is prohibited."]}}
+          ]
+        }
+      ]
+    },
+
+    {
+      title: "Episode 5: Information Protection and Confidentiality",
+      btn: "Episode 5 — Start",
+      summaryMedia: "ep5_summary.png",
+      lessons: [
+        "Destroy unnecessary personal data immediately after purpose is achieved.",
+        "Do not leave physical documents/media unattended; retrieve and store them promptly.",
+        "Internal information must not be shared externally."
+      ],
+      situations: [
+        {
+          meta: "Episode 5 · Situation 5-1 — Data Minimization",
+          media: "situation_ep5_1.png",
+          text: "While cleaning servers, you find an old scan of another employee’s passport. “Is it okay to keep this?” You hesitate, {{name}}.",
+          choices: [
+            { text:"It’s personal data—destroy it immediately.", correct:true,
+              feedback:{title:"Good Choice", body:"Personal data not permitted by law should be destroyed.", warn:["Beware of personal data protection violations."]}},
+            { text:"Leave it—it might be useful later.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Keeping unnecessary personal data may violate the law and can lead to leaks/misuse.", warn:["Beware of personal data protection violations."]}}
+          ]
+        },
+        {
+          meta: "Episode 5 · Situation 5-2 — Safe Handling",
+          media: "situation_ep5_2.png",
+          text: "In a rush, you leave a confidential document in a meeting room. Outsiders might see it, {{name}}.",
+          choices: [
+            { text:"Retrieve it immediately and store it securely.", correct:true,
+              feedback:{title:"Good Choice", body:"Blocking physical access is the most basic safeguard.", warn:["Leaving documents unattended may lead to unauthorized viewing."]}},
+            { text:"Leave it; you don’t have time.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Even brief neglect can cause a leak or misunderstanding.", warn:["Don’t be negligent with document control."]}}
+          ]
+        },
+        {
+          meta: "Episode 5 · Situation 5-3 — No Use Beyond Purpose",
+          media: "situation_ep5_3.png",
+          text: "A close friend outside the company asks, “Can you share some company info? My employer really needs it,” {{name}}.",
+          choices: [
+            { text:"Internal info is off-limits—stick to public info or decline.", correct:true,
+              feedback:{title:"Good Choice", body:"You protected both data subjects and the company.", warn:["External provision or use beyond purpose of internal info is prohibited."]}},
+            { text:"Share internal info on condition they keep it secret.", correct:false,
+              feedback:{title:"Wrong Choice", body:"Leakage is leakage, even with conditions.", warn:["Confidential leaks must be prevented."]}}
+          ]
+        }
+      ]
+    }
+  ];
+
+  // ---------- Helpers ----------
+  const $ = sel => document.querySelector(sel);
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+    $('#'+id).classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'instant'});
+    renderNames();
+  }
+  function renderNames(){
+    document.querySelectorAll('.pname').forEach(el=>el.textContent=playerName);
+    $('#crumb').textContent = `Player: ${playerName}`;
+  }
+  function startGame(){
+    const v = ($('#playerNameInput').value||'').trim();
+    playerName = v || 'Player';
+    buildEpisodeButtons();
+    go('menuScreen');
+  }
+  function changeName(){
+    const v = prompt('Enter a new player name', playerName);
+    if (v!==null){
+      const nv = v.trim();
+      if (nv) playerName = nv;
+      renderNames();
+    }
+  }
+  function buildEpisodeButtons(){
+    const box = $('#episodeButtons');
+    box.innerHTML = '';
+    episodes.forEach((ep, i) => {
+      const b = document.createElement('button');
+      b.className = 'ghost';
+      b.textContent = ep.title;
+      b.onclick = () => startEpisode(i);
+      box.appendChild(b);
+    });
+  }
+
+  // media renderer: right-side container per screen (images only)
+  function renderMediaInto(sel, src, alt){
+    const box = $(sel);
+    box.innerHTML = '';
+    if (!src) return;
+    const img = document.createElement('img');
+    img.src = src; img.alt = alt || 'Image';
+    box.appendChild(img);
+  }
+
+  // Choice color cycling
+  const colorClasses = ['c1','c2','c3','c4','c5','c6'];
+
+  function startEpisode(epIndex){
+    currentEpisode = epIndex;
+    currentSituation = 0;
+    showSituation();
+  }
+
+  function showSituation(){
+    const ep = episodes[currentEpisode];
+    const sit = ep.situations[currentSituation];
+
+    go('situationScreen');
+
+    // media (right)
+    renderMediaInto('#situationMediaRight', sit.media, sit.meta);
+
+    // meta & text (left)
+    $('#sceneMeta').textContent = sit.meta || '';
+    $('#episodeTitle').textContent = ep.title + ' — Situation ' + (currentSituation+1);
+    $('#situationText').textContent = (sit.text||'').replaceAll('{{name}}', playerName);
+
+    // choices randomized with colored borders
+    const shuffled = [...sit.choices].sort(()=>Math.random()-0.5);
+    const bowl = $('#choices'); bowl.innerHTML = '';
+    shuffled.forEach((choice, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice ' + colorClasses[idx % colorClasses.length];
+      btn.textContent = choice.text;
+      btn.onclick = () => showResult(choice);
+      bowl.appendChild(btn);
+    });
+  }
+
+  function showResult(choice){
+    go('resultScreen');
+
+    const good = !!choice.correct;
+    $('#resultTitle').className = good ? 'good' : 'bad';
+    $('#resultTitle').textContent = choice.feedback?.title || (good ? 'Good Choice' : 'Wrong Choice');
+    $('#resultText').textContent = choice.feedback?.body || (good ? 'Sound judgment.' : 'Please reconsider.');
+
+    // result media (images only)
+    const GOOD_MEDIA = ["good_choice.png","good_choice_alt1.png","good_choice_alt2.png"];
+    const BAD_MEDIA  = ["bad_choice.png","bad_choice_alt1.png","bad_choice_alt2.png"];
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const resultSrc = choice.resultMedia || (good ? pick(GOOD_MEDIA) : pick(BAD_MEDIA));
+    renderMediaInto('#resultMediaRight', resultSrc, good ? 'Good Choice' : 'Bad Choice');
+
+    // warnings
+    const warn = choice.feedback?.warn || [];
+    const ul = $('#resultWarn'); ul.innerHTML = '';
+    warn.forEach(w => { const li=document.createElement('li'); li.textContent=w; ul.appendChild(li); });
+
+    // next button behavior
+    const ep = episodes[currentEpisode];
+    const nextBtn = $('#nextButton');
+    nextBtn.onclick = () => {
+      if (currentSituation < ep.situations.length - 1){
+        currentSituation++; showSituation();
+      } else {
+        showEpisodeSummary();
+      }
+    };
+    nextBtn.textContent = (currentSituation < ep.situations.length - 1) ? 'Next Situation in this Episode' : 'View Episode Summary';
+  }
+
+  function showEpisodeSummary(){
+    const ep = episodes[currentEpisode];
+    go('episodeSummaryScreen');
+
+    // Prefer ep.summaryMedia; fallback to last situation image
+    const lastMedia = ep.situations[ep.situations.length - 1]?.media || '';
+    const sumMedia = ep.summaryMedia || lastMedia;
+    renderMediaInto('#summaryMediaRight', sumMedia, ep.title + ' Summary');
+
+    // Text
+    $('#summaryTitle').textContent = ep.title + ' — Summary';
+    $('#summaryIntro').textContent = `${playerName}, here are the key points from this episode:`;
+
+    const ul = $('#summaryList'); ul.innerHTML = '';
+    (ep.lessons || []).forEach(item => {
+      const li = document.createElement('li'); li.textContent = '' + item; ul.appendChild(li);
+    });
+
+    const btn = $('#summaryNextButton');
+    if (currentEpisode < episodes.length - 1){
+      btn.textContent = 'Next Episode';
+      btn.onclick = () => { currentEpisode++; currentSituation = 0; showSituation(); };
+    } else {
+      btn.textContent = 'Final Episode Complete';
+      btn.onclick = () => go('menuScreen');
+    }
+  }
+
+  // Build menu on load
+  (function init(){ renderNames(); buildEpisodeButtons(); })();
+</script>
+</body>
+</html>
