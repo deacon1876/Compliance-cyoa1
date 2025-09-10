@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>🎉 컴플라이언스 카드 짝 맞추기</title>
+<style>
+  :root {
+    --card-w: 120px; 
+    --card-h: 160px; 
+    --gap: 22px;
+    --primary: #ff4d6d;
+    --secondary: #ffd93d;
+    --tertiary: #4cafef;
+  }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', Arial, sans-serif;
+    display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+    background: linear-gradient(135deg, #ffecd2, #fcb69f, #fad0c4, #ffd1ff);
+    background-size: 400% 400%;
+    animation: bgmove 12s ease infinite;
+    color: #222;
+  }
+  @keyframes bgmove {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+  }
+
+  .topbar {
+    width: 100%; max-width: 700px; padding: 14px 16px; box-sizing: border-box;
+    display: flex; gap: 12px; align-items: center; justify-content: space-between;
+  }
+  .stats { display: flex; gap: 16px; align-items: baseline; }
+  .timer, .best { font-weight: 700; font-size: 1.2rem; }
+  .result { opacity: 0.95; font-size: 1rem; font-weight: 600; }
+
+  .controls { display: flex; gap: 8px; }
+  button {
+    background: var(--primary); color: #fff; border: 0; padding: 8px 14px;
+    border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.2s;
+  }
+  button:hover { transform: scale(1.05); background: #ff3355; }
+  button:disabled { opacity: 0.6; cursor: default; }
+
+  .game {
+    display: grid;
+    grid-template-columns: repeat(4, var(--card-w));
+    gap: var(--gap);
+    padding: 10px;
+    user-select: none;
+    justify-content: center;
+  }
+
+  .card {
+    width: var(--card-w); height: var(--card-h);
+    perspective: 1000px; cursor: pointer;
+  }
+  .inner {
+    width: 100%; height: 100%; position: relative;
+    transform-style: preserve-3d; transition: transform 0.6s;
+  }
+  .card.flip .inner { transform: rotateY(180deg); }
+  .front, .back {
+    position: absolute; inset: 0;
+    backface-visibility: hidden; border-radius: 12px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1rem; padding: 10px; text-align: center;
+    border: 2px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover .front { box-shadow: 0 0 12px var(--secondary); }
+
+  .front { background: #fff; color: #999; }
+  .back { 
+    background: linear-gradient(135deg, var(--primary), var(--secondary), var(--tertiary));
+    color: #fff; font-weight: bold; transform: rotateY(180deg);
+  }
+  .card.matched { cursor: default; opacity: 0.85; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="stats">
+      <div class="timer" aria-live="polite">00:00.0</div>
+      <div class="best" aria-live="polite">Best: —</div>
+    </div>
+    <div class="controls">
+      <button id="resetBtn" type="button">🔄 Reset</button>
+    </div>
+  </div>
+  <div class="topbar" style="padding-top:0; padding-bottom:0;">
+    <div class="result" aria-live="polite"></div>
+  </div>
+
+  <div class="game" aria-label="카드 짝 맞추기 보드"></div>
+
+<script>
+const words = ['Compliance','Integrity','Co-Prosperity','하도급법','대리점법','FCPA'];
+const BEST_KEY = 'memoryBestMs_v2_' + words.join('|');
+
+const totalPairs = words.length;
+let matchedPairs, first, second, lock, startTime, tick;
+
+const game = document.querySelector('.game');
+const timerEl = document.querySelector('.timer');
+const bestEl  = document.querySelector('.best');
+const resultEl = document.querySelector('.result');
+const resetBtn = document.getElementById('resetBtn');
+
+function formatTime(ms) {
+  if (ms == null) return '—';
+  const totalSeconds = ms/1000;
+  const m = Math.floor(totalSeconds/60);
+  const s = Math.floor(totalSeconds%60);
+  const t = Math.floor((totalSeconds - Math.floor(totalSeconds))*10);
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${t}`;
+}
+function shuffle(arr) {
+  for (let i = arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function startTimer(){
+  if(startTime!==null) return;
+  startTime=performance.now();
+  tick=setInterval(()=>{
+    timerEl.textContent=formatTime(performance.now()-startTime);
+  },100);
+}
+function stopTimer(){
+  if(tick) clearInterval(tick);
+  const final=performance.now()-startTime;
+  timerEl.textContent=formatTime(final);
+  handleFinish(final);
+}
+function loadBest(){const v=localStorage.getItem(BEST_KEY);return v?Number(v):null;}
+function saveBest(ms){localStorage.setItem(BEST_KEY,String(ms));}
+function renderBest(){bestEl.textContent=`Best: ${formatTime(loadBest())}`;}
+function buildBoard(){
+  const deck=shuffle([...words,...words]);
+  game.innerHTML='';
+  deck.forEach(word=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <div class="inner">
+        <div class="front">?</div>
+        <div class="back">${word}</div>
+      </div>`;
+    card.addEventListener('click',()=>handleFlip(card));
+    game.appendChild(card);
+  });
+}
+function resetGame(){
+  matchedPairs=0;first=second=null;lock=false;startTime=null;
+  if(tick) clearInterval(tick);
+  timerEl.textContent='00:00.0';resultEl.textContent='';
+  buildBoard();renderBest();
+}
+function handleFlip(card){
+  if(lock||card.classList.contains('flip')||card.classList.contains('matched'))return;
+  startTimer();
+  card.classList.add('flip');
+  if(!first){first=card;return;}
+  second=card;lock=true;
+  const a=first.querySelector('.back').textContent;
+  const b=second.querySelector('.back').textContent;
+  if(a===b){
+    [first,second].forEach(c=>{c.classList.add('matched');c.style.pointerEvents='none';});
+    matchedPairs++;first=second=null;lock=false;
+    if(matchedPairs===totalPairs) stopTimer();
+  }else{
+    setTimeout(()=>{first.classList.remove('flip');second.classList.remove('flip');
+      first=second=null;lock=false;},900);
+  }
+}
+function handleFinish(ms){
+  const prev=loadBest();
+  if(prev===null||ms<prev){saveBest(ms);renderBest();resultEl.textContent=`🎉 Finished in ${formatTime(ms)} — New best!`;showConfetti();}
+  else{resultEl.textContent=`🎉 Finished in ${formatTime(ms)} (Best: ${formatTime(prev)})`;showConfetti();}
+}
+
+/* --- festive confetti --- */
+function showConfetti(){
+  for(let i=0;i<50;i++){
+    const conf=document.createElement('div');
+    conf.textContent='🎊';
+    conf.style.position='fixed';
+    conf.style.left=Math.random()*100+'vw';
+    conf.style.top='-2rem';
+    conf.style.fontSize='1.5rem';
+    conf.style.animation=`fall ${2+Math.random()*3}s linear forwards`;
+    document.body.appendChild(conf);
+    setTimeout(()=>conf.remove(),5000);
+  }
+}
+const style=document.createElement('style');
+style.textContent=`@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0;}}`;
+document.head.appendChild(style);
+
+resetBtn.addEventListener('click', resetGame);
+resetGame();
+</script>
+</body>
+</html>
