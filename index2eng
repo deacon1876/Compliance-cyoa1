@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>Compliance Adventure — CYOA</title>
+<style>
+  :root{ --hdr:56px; }
+
+  /* Base */
+  body {
+    margin:0;background:#0b1020;color:#e5e7eb;
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    overflow:hidden;
+  }
+  .hidden{display:none}
+
+  /* Header */
+  header{position:sticky;top:0;background:rgba(2,6,23,.75);backdrop-filter:blur(8px);border-bottom:1px solid rgba(148,163,184,.25);z-index:5}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;height:var(--hdr);display:flex;justify-content:space-between;align-items:center}
+  .title{font-weight:800}
+  .pill{border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:.25rem .7rem;color:#94a3b8}
+
+  /* Screen uses full viewport under header */
+  .screen{height:calc(100vh - var(--hdr));padding:0}
+
+  /* Stage layout */
+  .stage{height:100%;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
+
+  /* Left panel */
+  .pane,.result,.summary,.final{height:100%;overflow:auto;background:rgba(17,24,39,.6);border:1px solid #1f2937;border-radius:0;padding:18px}
+  @media (min-width:901px){
+    .pane,.result,.summary,.final{border-radius:16px 0 0 16px}
+    .mediaBox{border-radius:0 16px 16px 0}
+  }
+
+  .scene-meta{color:#94a3b8;margin-bottom:6px}
+  .choices{display:grid;gap:12px;margin-top:14px}
+  button.choice{appearance:none;background:rgba(255,255,255,.06);color:#e5e7eb;padding:14px;border-radius:12px;text-align:left;font-weight:700;cursor:pointer;transition:.15s ease;border:3px solid transparent}
+  button.choice:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  button.choice:focus{outline:3px solid #60a5fa;outline-offset:2px}
+
+  .c1{border-color:#60a5fa}      .c1:hover{background:rgba(96,165,250,.12)}
+  .c2{border-color:#34d399}      .c2:hover{background:rgba(52,211,153,.12)}
+  .c3{border-color:#f59e0b}      .c3:hover{background:rgba(245,158,11,.12)}
+  .c4{border-color:#a78bfa}      .c4:hover{background:rgba(167,139,250,.12)}
+  .c5{border-color:#fb7185}      .c5:hover{background:rgba(251,113,133,.12)}
+  .c6{border-color:#22d3ee}      .c6:hover{background:rgba(34,211,238,.12)}
+
+  .mediaBox{height:100%;overflow:hidden;background:#0a0f1d;border:1px solid #1f2937}
+  .mediaBox img{width:100%;height:100%;object-fit:cover;display:block}
+
+  .good{color:#22c55e;font-weight:800}
+  .bad{color:#f87171;font-weight:800}
+  .warn{color:#94a3b8;margin:.5rem 0 0 1rem}
+
+  #resultWarn, #finalList { list-style-type:none; padding-left:0; margin-left:0; }
+
+  .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+  .btn{background:linear-gradient(90deg,#60a5fa,#3b82f6);color:#fff;border:0;padding:.8rem 1rem;border-radius:10px;font-weight:800;cursor:pointer}
+  .ghost{background:transparent;color:#e5e7eb;border:1px solid rgba(148,163,184,.45);padding:.8rem 1rem;border-radius:10px;font-weight:700;cursor:pointer}
+
+  /* Final list rows */
+  .row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid rgba(148,163,184,.25);border-radius:10px;margin-bottom:8px;background:rgba(255,255,255,.04)}
+  .tag{font-size:12px;color:#94a3b8}
+  .badge{font-weight:800}
+  .badge.good{color:#22c55e}
+  .badge.bad{color:#f87171}
+
+  /* Home icon button */
+  .homebtn{display:inline-flex;align-items:center;gap:8px}
+  .homebtn svg{width:18px;height:18px}
+
+  /* Responsive (mobile) */
+  @media (max-width:900px){
+    .stage{grid-template-columns:1fr;grid-template-rows:55vh 45vh}
+    .mediaBox{grid-row:2/3;border-radius:0}
+    .pane,.result,.summary,.final{grid-row:1/2;border-radius:0}
+
+    body, h1, h2, h3, h4, h5, h6,
+    p, span, div, button, input, select, textarea { font-size:12px; }
+    h2{font-size:13px}
+    h3{font-size:14px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="title">Compliance Adventure</div>
+    <div>
+      <button class="ghost homebtn" onclick="go('menuScreen')" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M9 22V12h6v10"/></svg>
+        Home
+      </button>
+      <span class="pill" id="crumb">Player: Player</span>
+    </div>
+  </div>
+</header>
+
+<!-- Start -->
+<section class="screen" id="startScreen">
+  <div class="stage">
+    <div class="pane" style="padding-top:22px;max-width:800px">
+      <h2>Get Started</h2>
+      <p>Enter your player name. If you leave it blank, we'll use “Player.”</p>
+      <input id="playerNameInput" type="text" placeholder="e.g., Alex / Jamie" style="width:90%;padding:12px 14px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:#0f172a;color:#e5e7eb;outline:none">
+      <div class="nav" style="justify-content:space-between">
+        <span style="color:#94a3b8">You can change it later from the menu.</span>
+        <button class="btn" onclick="startGame()" type="button">Start</button>
+      </div>
+    </div>
+    <div class="mediaBox"><img src="cover.png" alt="Game cover"></div>
+  </div>
+</section>
+
+<!-- Menu -->
+<section class="screen hidden" id="menuScreen">
+  <div class="stage">
+    <div class="pane" style="padding-top:22px;max-width:800px">
+      <h2>3-Episode Course</h2>
+      <p><span class="pname">Player</span>, the three episodes will run in sequence.</p>
+
+      <!-- course description -->
+      <div class="courseDesc" style="margin:12px 0 16px;padding:12px 14px;border:1px solid rgba(148,163,184,.35);border-radius:10px;background:rgba(255,255,255,.04);color:#cbd5e1;">
+        <h3 style="margin:0 0 6px 0;font-size:1rem">About This Course</h3>
+        <p style="margin:0">Realistic workplace scenarios covering three topics:</p>
+        <ul style="margin:8px 0 0 18px">
+          <li>Episode 1 — Workplace Harassment Response</li>
+          <li>Episode 2 — Integrity (Gifts & Hospitality)</li>
+          <li>Episode 3 — Fair Competition</li>
+        </ul>
+      </div>
+
+      <div id="episodeButtons" class="fullgrid">
+        <button class="btn" onclick="startCourse()" type="button">Start Course</button>
+        <button class="ghost" onclick="changeName()" type="button">Change Player Name</button>
+        <button class="ghost" onclick="resetCourse()" type="button">Reset</button>
+      </div>
+    </div>
+    <div class="mediaBox"><img src="menu_banner.png" alt="Main menu"></div>
+  </div>
+</section>
+
+<!-- Situation -->
+<section class="screen hidden" id="situationScreen">
+  <div class="stage">
+    <div class="pane">
+      <div class="scene-meta" id="sceneMeta"></div>
+      <h2 id="episodeTitle"></h2>
+      <p id="situationText"></p>
+      <div id="choices" class="choices" role="listbox" aria-label="Choices"></div>
+    </div>
+    <div class="mediaBox" id="situationMediaRight" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- Result (per-situation) -->
+<section class="screen hidden" id="resultScreen">
+  <div class="stage">
+    <div class="result">
+      <h3 id="resultTitle"></h3>
+      <p id="resultText"></p>
+      <ul class="warn" id="resultWarn"></ul>
+      <div class="nav">
+        <button class="ghost" onclick="go('menuScreen')" type="button">Main Menu</button>
+        <button class="btn" id="nextButton" type="button">Next</button>
+      </div>
+    </div>
+    <div class="mediaBox" id="resultMediaRight" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- Final Results -->
+<section class="screen hidden" id="finalResultsScreen">
+  <div class="stage">
+    <div class="final">
+      <h3>Final Results</h3>
+      <p id="scoreLine"></p>
+      <div id="finalList"></div>
+      <div class="nav" style="justify-content:space-between">
+        <button class="ghost homebtn" onclick="go('menuScreen')" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M9 22V12h6v10"/></svg>
+          Back to Menu
+        </button>
+        <button class="btn" onclick="startCourse()" type="button">Restart</button>
+      </div>
+    </div>
+    <div class="mediaBox" id="finalMediaRight"><img src="ep3_summary.png" alt="Summary"></div>
+  </div>
+</section>
+
+<script>
+  // ---------- State ----------
+  let playerName = 'Player';
+  let currentEpisode = 0;
+  let currentSituation = 0;
+
+  // Tracking answers for final results
+  const answers = [];
+  let correctCount = 0;
+  let totalQuestions = 0;
+
+  // ---------- Security helper ----------
+  function escapeHTML(s=''){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+  }
+
+  // ---------- Data (3 episodes only) ----------
+  const episodes = [
+  // EPISODE 1: Workplace Harassment Response
+  {
+    title: "Episode 1: Workplace Harassment Response",
+    summaryMedia: "ep1_summary.png",
+    situations: [
+      {
+        meta: "Episode 1 · Situation 1-1",
+        media: "situation_ep3_1.png",
+        text: "A senior employee is verbally abusing a new hire. <br>Everyone looks away. What should {{name}} do?",
+        choices: [
+          { text:"Intervene: tell them to stop and, if needed, report it.",
+            correct:true,
+            feedback:{
+              title:"Good choice",
+              body:"Company anti-harassment policy applies. If conduct is based on a protected characteristic, it may also violate U.S. Title VII (hostile work environment). Even if not unlawful, it's unacceptable and may breach the OSHA General Duty Clause to provide a safe workplace."
+            }
+          },
+          { text:"Stay silent.",
+            correct:false,
+            feedback:{
+              title:"Not the best",
+              body:"Silence enables harm. Report or escalate per policy (HR/Compliance). Speak up to protect colleagues and culture."
+            }
+          }
+        ]
+      },
+      {
+        meta: "Episode 1 · Situation 1-2",
+        media: "situation_ep3_2.png",
+        text: "You witnessed bullying in another department. Do you have standing to report it? What should {{name}} do?",
+        choices: [
+          { text:"Yes. Anyone can report concerns; the company must review promptly and objectively.",
+            correct:true,
+            feedback:{
+              title:"Good choice",
+              body:"Most company policies allow any employee to report misconduct. Early reporting helps stop escalation and protects people."
+            }
+          },
+          { text:"Do nothing—it's not my team.",
+            correct:false,
+            feedback:{
+              title:"Not the best",
+              body:"'Not my team' thinking leaves risk unchecked and contradicts our duty to ensure a respectful workplace."
+            }
+          }
+        ]
+      },
+      {
+        meta: "Episode 1 · Situation 1-3",
+        media: "situation_ep3_3.png",
+        text: "On a group chat, several employees mock a colleague. Online ridicule can also be harassment. What should {{name}} do?",
+        choices: [
+          { text:"Ask them to stop and point to reporting/support channels.",
+            correct:true,
+            feedback:{
+              title:"Good choice",
+              body:"Digital spaces are still the workplace. Shut it down, support the target, and report if needed."
+            }
+          },
+          { text:"Say nothing to avoid friction.",
+            correct:false,
+            feedback:{
+              title:"Not the best",
+              body:"Avoidance normalizes misconduct and erodes trust."
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  // EPISODE 2: Integrity (Gifts & Hospitality)
+  {
+    title: "Episode 2: Integrity (Gifts & Hospitality)",
+    summaryMedia: "ep2_summary.png",
+    situations: [
+      {
+        meta: "Episode 2 · Situation 2-1",
+        media: "situation_ep2_1.png",
+        text: "A supplier invites you to an upscale restaurant as part of a so-called \"official\" event. What should {{name}} do?",
+        choices: [
+          { text:"Decline politely, citing company policy and anti-bribery rules.",
+            correct:true,
+            feedback:{
+              title:"Good choice",
+              body:"Excessive hospitality can be an improper inducement. Follow company policy and applicable laws (e.g., FCPA when public officials are involved; U.K. Bribery Act 2010; U.S. state commercial bribery statutes). Keep it modest, transparent, and pre-approved if allowed at all."
+            }
+          },
+          { text:"Attend—it's labeled as an \"official\" function.",
+            correct:false,
+            feedback:{
+              title:"Not the best",
+              body:"Labels don't change substance. If it could influence (or appear to influence) decisions, it's a problem."
+            }
+          }
+        ]
+      },
+      {
+        meta: "Episode 2 · Situation 2-2",
+        media: "situation_ep2_2.png",
+        text: "A partner offers an expensive gift. You're unsure if it's prohibited. What should {{name}} do?",
+        choices: [
+          { text:"Explain you cannot accept and decline. Document and notify Compliance.",
+            correct:true,
+            feedback:{
+              title:"Good choice",
+              body:"Accepting creates conflicts and appearance of impropriety. Follow policy: decline, record, and report."
+            }
+          },
+          { text:"Accept now, sort it out later.",
+            correct:false,
+            feedback:{
+              title:"Not the best",
+              body:"Risk begins at acceptance. Post‑hoc fixes rarely undo perception or policy breaches."
+            }
+          }
+        ]
+      },
+      {
+        meta: "Episode 2 · Situation 2-3",
+        media: "situation_ep2_3.png",
+        text: "A teammate says, \"Everyone takes small gifts—don't be so strict.\" What should {{name}} do?",
+        choices: [
+          { text:"Hold the line—small perks add up and erode trust.",
+            correct:true,
+            feedback:{
+              title:"Good choice",
+              body:"Culture is built by daily choices. Consistency prevents drift toward quid‑pro‑quo expectations."
+            }
+          },
+          { text:"Go along to keep the mood.",
+            correct:false,
+            feedback:{
+              title:"Not the best",
+              body:"Normalizing exceptions leads to bigger violations and reputational damage."
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  // EPISODE 3: Fair Competition
+  {
+    title: "Episode 3: Fair Competition",
+    summaryMedia: "ep3_summary.png",
+    situations: [
+      {
+        meta: "Episode 3 · Situation 3-1",
+        media: "situation_ep1_1.png",
+        text: "A vendor asks: ‘Please make sure we win this bid.’ That would be bid interference. What should {{name}} do?",
+        choices: [
+          { text: "Explain that only the published criteria and process apply—no side help.",
+            correct: true,
+            feedback: {
+              title:"Good choice",
+              body:"Agreeing outcomes or sharing non‑public advantages can be bid‑rigging or collusion, a felony under the U.S. Sherman Act §1. If it's a government tender, additional rules (e.g., Procurement Integrity Act) apply."
+            }
+          },
+          { text: "Quietly tip them off to a judge's preferences.",
+            correct: false,
+            feedback: {
+              title:"Not the best",
+              body:"Tilting the field undermines competition and may constitute fraud, collusion, or procurement misconduct."
+            }
+          }
+        ]
+      },
+      {
+        meta: "Episode 3 · Situation 3-2",
+        media: "situation_ep1_2.png",
+        text: "Your manager says, ‘Let's favor Vendor X on this RFP.’ What should {{name}} do?",
+        choices: [
+          { text: "Push for a fair, documented evaluation per the published criteria.",
+            correct: true,
+            feedback:{ 
+              title:"Good choice", 
+              body:"Steering can violate antitrust/competition principles and internal controls, and expose the company (and you) to fraud or breach‑of‑duty claims. Escalate to Legal/Compliance if pressure continues."
+            }
+          },
+          { text: "Follow the directive without question.",
+            correct:false,
+            feedback:{ 
+              title:"Not the best", 
+              body:"Improper favoritism risks legal exposure (e.g., false statements, fraud, commercial bribery) and personal discipline."
+            }
+          }
+        ]
+      },
+      {
+        meta: "Episode 3 · Situation 3-3",
+        media: "situation_ep1_3.png",
+        text: "You learn material non‑public information (MNPI) about a listed company and expect a big price move. What should {{name}} do?",
+        choices: [
+          { text: "Do not trade or tip anyone. Safeguard the information.",
+            correct: true,
+            feedback:{ 
+              title:"Good choice", 
+              body:"Trading or tipping on MNPI violates U.S. securities laws (Exchange Act §10(b) and SEC Rule 10b‑5). It undermines market integrity and can lead to civil and criminal penalties."
+            }
+          },
+          { text: "Make a small, quick profit—who would notice?",
+            correct:false,
+            feedback:{ 
+              title:"Not the best", 
+              body:"Amount doesn’t matter. Intent and use of MNPI trigger liability and harm trust."
+            }
+          }
+        ]
+      }
+    ]
+  }
+];
+
+  // ---------- Helpers ----------
+  const $ = sel => document.querySelector(sel);
+  const colorClasses = ['c1','c2','c3','c4','c5','c6'];
+
+  function go(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+    $('#'+id).classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    renderNames();
+  }
+  function renderNames(){
+    document.querySelectorAll('.pname').forEach(el=>el.textContent=playerName);
+    $('#crumb').textContent = `Player: ${playerName}`;
+  }
+
+  function startGame(){
+    const v = ($('#playerNameInput').value||'').trim();
+    playerName = v || 'Player';
+    go('menuScreen');
+  }
+  function changeName(){
+    const v = prompt('Enter a new player name', playerName);
+    if (v!==null){
+      const nv = v.trim();
+      if (nv) playerName = nv;
+      renderNames();
+    }
+  }
+  function resetCourse(){
+    currentEpisode = 0; currentSituation = 0;
+    answers.length = 0; correctCount = 0;
+    go('menuScreen');
+  }
+  function startCourse(){
+    // reset progress & counters
+    currentEpisode = 0; currentSituation = 0;
+    answers.length = 0; correctCount = 0;
+    totalQuestions = episodes.reduce((n,ep)=>n + ep.situations.length, 0);
+    showSituation();
+  }
+
+  function renderMediaInto(sel, src, alt){
+    const box = $(sel);
+    box.innerHTML = '';
+    if (!src) return;
+    const img = document.createElement('img');
+    img.src = src; img.alt = alt || 'image';
+    box.appendChild(img);
+    box.setAttribute('aria-label', alt || 'image');
+  }
+
+  function showSituation(){
+    const ep = episodes[currentEpisode];
+    const sit = ep.situations[currentSituation];
+    go('situationScreen');
+
+    renderMediaInto('#situationMediaRight', sit.media, sit.meta);
+    $('#sceneMeta').textContent = sit.meta || '';
+    $('#episodeTitle').textContent = ep.title + ' — Situation ' + (currentSituation+1);
+    // allow inline HTML like <br>, while escaping playerName only
+    $('#situationText').innerHTML = (sit.text||'').replaceAll('{{name}}', escapeHTML(playerName));
+
+    // choices randomized
+    const shuffled = [...sit.choices].sort(()=>Math.random()-0.5);
+    const bowl = $('#choices'); bowl.innerHTML = '';
+    shuffled.forEach((choice, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'choice ' + colorClasses[idx % colorClasses.length];
+      btn.textContent = choice.text;
+      btn.onclick = () => showResult(choice);
+      // Do NOT leak correctness in accessibility labels
+      btn.setAttribute('role','option');
+      btn.setAttribute('aria-label', 'Choice');
+      bowl.appendChild(btn);
+    });
+
+    const first = bowl.querySelector('button.choice'); if (first) first.focus();
+    bowl.onkeydown = (e)=>{
+      const buttons = [...bowl.querySelectorAll('button.choice')];
+      const i = buttons.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight'){ e.preventDefault(); buttons[(i+1+buttons.length)%buttons.length]?.focus(); }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ e.preventDefault(); buttons[(i-1+buttons.length)%buttons.length]?.focus(); }
+      if (e.key === 'Enter' && document.activeElement?.classList.contains('choice')){ document.activeElement.click(); }
+    };
+  }
+
+  function showResult(choice){
+    go('resultScreen');
+
+    const good = !!choice.correct;
+    if (good) correctCount++;
+
+    // record for final results
+    const ep = episodes[currentEpisode];
+    const sit = ep.situations[currentSituation];
+    answers.push({
+      epIndex: currentEpisode,
+      epTitle: ep.title,
+      meta: sit.meta,
+      question: (sit.text||'').replaceAll('{{name}}', playerName),
+      picked: choice.text,
+      correct: good
+    });
+
+    // UI
+    $('#resultTitle').className = good ? 'good' : 'bad';
+    $('#resultTitle').textContent = choice.feedback?.title || (good ? 'Good choice' : 'Not the best');
+    $('#resultText').innerHTML = choice.feedback?.body || (good ? 'Sound judgment.' : 'Reconsider your approach.');
+
+    // result image
+    const GOOD_MEDIA = ["good_choice.png","good_choice_alt1.png","good_choice_alt2.png"];
+    const BAD_MEDIA  = ["bad_choice.png","bad_choice_alt1.png","bad_choice_alt2.png"];
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const resultSrc = choice.resultMedia || (good ? pick(GOOD_MEDIA) : pick(BAD_MEDIA));
+    renderMediaInto('#resultMediaRight', resultSrc, good ? 'Good choice' : 'Poor choice');
+
+    // warnings
+    const warn = choice.feedback?.warn || [];
+    const ul = $('#resultWarn'); ul.innerHTML = '';
+    warn.forEach(w => { const li=document.createElement('li'); li.textContent=w; ul.appendChild(li); });
+
+    // next
+    const nextBtn = $('#nextButton');
+    const isLastSituation = currentSituation >= ep.situations.length - 1;
+    const isLastEpisode = currentEpisode >= episodes.length - 1;
+
+    nextBtn.onclick = () => {
+      if (!isLastSituation){
+        currentSituation++; showSituation();
+      } else if (!isLastEpisode){
+        currentEpisode++; currentSituation = 0; showSituation();
+      } else {
+        showFinalResults();
+      }
+    };
+    nextBtn.textContent = (!isLastSituation) ? 'Next Situation' : (!isLastEpisode ? 'Next Episode' : 'View Final Results');
+  }
+
+  function showFinalResults(){
+    go('finalResultsScreen');
+
+    // Score line
+    $('#scoreLine').textContent = `${playerName}'s Score: ${correctCount} / ${totalQuestions}`;
+
+    // List
+    const box = $('#finalList'); box.innerHTML = '';
+    answers.forEach((a, idx) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const idxSpan = document.createElement('div');
+      idxSpan.textContent = `${idx+1}.`;
+      const textDiv = document.createElement('div');
+      const t1 = document.createElement('div');
+      t1.innerHTML = `<span class="tag">${episodes[a.epIndex].title}</span>`;
+      const t2 = document.createElement('div');
+      t2.textContent = a.meta || '';
+      const t3 = document.createElement('div');
+      t3.textContent = `Picked: ${a.picked}`;
+      textDiv.appendChild(t1); textDiv.appendChild(t2); textDiv.appendChild(t3);
+
+      const badge = document.createElement('div');
+      badge.className = 'badge ' + (a.correct ? 'good' : 'bad');
+      badge.textContent = a.correct ? 'Correct' : 'Incorrect';
+
+      row.appendChild(idxSpan); row.appendChild(textDiv); row.appendChild(badge);
+      box.appendChild(row);
+    });
+
+    // Right media (use last episode summary by default)
+    const lastSum = episodes[episodes.length-1].summaryMedia || 'ep3_summary.png';
+    renderMediaInto('#finalMediaRight', lastSum, 'Course summary');
+  }
+
+  // Initial render
+  (function init(){ renderNames(); })();
+</script>
+</body>
+</html>
