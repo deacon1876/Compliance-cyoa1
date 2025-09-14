@@ -150,7 +150,7 @@
       <div class="scene-meta" id="sceneMeta"></div>
       <h2 id="episodeTitle"></h2>
       <p id="situationText"></p>
-      <div id="choices" class="choices"></div>
+      <div id="choices" class="choices" role="listbox" aria-label="선택지"></div>
     </div>
     <div class="mediaBox" id="situationMediaRight" aria-live="polite"></div>
   </div>
@@ -202,12 +202,17 @@
   let correctCount = 0;
   let totalQuestions = 0;
 
+  // ---------- Security helper ----------
+  function escapeHTML(s=''){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+  }
+
   // ---------- Data (3 episodes only) ----------
   const episodes = [
   // EPISODE 1: 직장 내 괴롭힘 대응
   {
     title: "에피소드 1: 직장 내 괴롭힘 대응",
-    summaryMedia: "ep3_summary.png",
+    summaryMedia: "ep1_summary.png",
     situations: [
       {
         meta: "에피소드 1 · 상황 1-1",
@@ -218,14 +223,14 @@
             correct:true,
             feedback:{
               title:"좋은 선택",
-              body:"근로기준법 제76조의2는 직장 내 괴롭힘을 금지합니다. <br>윤리적으로도 방관하는 것은 피해자를 외면하는 것입니다."
+              body:"근로기준법 제76조의2는 직장 내 괴롭힘을 금지합니다. <br>윤리적으로도 방관은 피해자를 외면하는 것입니다."
             }
           },
           { text:"침묵한다.",
             correct:false,
             feedback:{
               title:"잘못된 선택",
-              body:"괴롭힘을 방관하는 것은 직장 내 괴롭힘을 금지하는 제76조의2의 취지에 반합니다. <br>윤리적으로도 침묵은 동조로 비칠 수 있습니다."
+              body:"괴롭힘을 방관하는 것은 근로기준법 제76조의2의 취지에 반합니다. <br>윤리적으로도 침묵은 동조로 비칠 수 있습니다."
             }
           }
         ]
@@ -239,14 +244,14 @@
             correct:true,
             feedback:{
               title:"좋은 선택",
-              body:"근로기준법 제76조의3에 따르면 누구든지 직장 내 괴롭힘 사실을 알게 되면 사용자에게 신고할 수 있으며, 사용자는 이에 대해 지체 없이 객관적으로 조사해야 합니다. <br>윤리적으로도 동료의 고통을 외면하지 않아야 합니다."
+              body:"근로기준법 제76조의3에 따르면 누구든지 직장 내 괴롭힘 사실을 알게 되면 사용자에게 신고할 수 있으며, 사용자는 지체 없이 객관적으로 조사해야 합니다. <br>윤리적으로도 동료의 고통을 외면하지 않아야 합니다."
             }
           },
           { text:"어차피 바뀌는 것도 없을 텐데 관여하지 말자.",
             correct:false,
             feedback:{
               title:"잘못된 선택",
-              body:"근로기준법 제76조의3에 따르면 누구든지 직장 내 괴롭힘 사실을 알게 되면 사용자에게 신고할 수 있으며, 사용자는 이에 대해 지체 없이 객관적으로 조사해야 합니다. <br>괴롭힘을 외면하면 것은 윤리적으로도 타인의 고통을 방관하는 것입니다."
+              body:"근로기준법 제76조의3에 따르면 누구든지 직장 내 괴롭힘 사실을 신고할 수 있고, 사용자는 지체 없이 객관적으로 조사해야 합니다. <br>외면은 윤리적으로 타인의 고통을 방관하는 것입니다."
             }
           }
         ]
@@ -260,14 +265,14 @@
             correct:true,
             feedback:{
               title:"좋은 선택",
-              body:"단체 채팅방에서 특정 직원을 흉보는 행위는 근로기준법 제76조의2 직장 내 괴롭힘에 해당할 수 있으며, 설사 법적 처벌로 이어지지 않더라도 윤리적·조직문화 차원에서 중대한 위반입니다. <br>윤리적으로도 불편함을 감수하고도 윤리적으로도 옳은 행동을 하는 것이 맞습니다."
+              body:"단체 채팅방에서 특정 직원을 흉보는 행위는 근로기준법 제76조의2 직장 내 괴롭힘에 해당할 수 있으며, 설사 법적 처벌로 이어지지 않더라도 윤리적·조직문화 차원에서 중대한 위반입니다. <br>불편함이 있더라도 옳은 행동을 선택해야 합니다."
             }
           },
           { text:"괜히 나섰다가 불편해질까봐 침묵한다.",
             correct:false,
             feedback:{
               title:"잘못된 선택",
-              body:"단체 채팅방에서 특정 직원을 흉보는 행위는 근로기준법 제76조의2 직장 내 괴롭힘에 해당할 수 있으며, 설사 법적 처벌로 이어지지 않더라도 윤리적·조직문화 차원에서 중대한 위반입니다. <br>또한 윤리적으로도 불편함을 감수하고도 윤리적으로도 옳은 행동을 하는 것이 맞습니다."
+              body:"단체 채팅방에서 특정 직원을 흉보는 행위는 근로기준법 제76조의2 직장 내 괴롭힘에 해당할 수 있습니다. <br>침묵은 문제를 방치하며 조직의 신뢰를 해칩니다."
             }
           }
         ]
@@ -289,14 +294,14 @@
             correct:true,
             feedback:{
               title:"좋은 선택",
-              body:"「독점규제 및 공정거래에 관한 법률」 제23조 제1항 제1호(부당한 고객유인행위 금지)에 따라 협력업체가 거래처를 고급 레스토랑으로 초대하는 것이 정상적인 업무 목적을 넘어선 과도한 접대라면, “부당한 고객유인행위”로 판단될 수 있습니다. <br>또한, 사내 규정 위반일 수 있습니다."
+              body:"「독점규제 및 공정거래에 관한 법률」 제23조 제1항 제1호(부당한 고객유인행위 금지). 과도한 접대는 부당한 유인으로 볼 수 있습니다. <br>또한 다수 기업의 임직원 행동강령은 거래처의 금품·향응 수수를 금지합니다."
             }
           },
           { text:"공식 자리로 포장되었으니 참석한다.",
             correct:false,
             feedback:{
               title:"잘못된 선택",
-              body:"「독점규제 및 공정거래에 관한 법률」 제23조 제1항 제1호(부당한 고객유인행위 금지)에 따라 협력업체가 거래처를 고급 레스토랑으로 초대하는 것이 정상적인 업무 목적을 넘어선 과도한 접대라면, “부당한 고객유인행위”로 판단될 수 있습니다. <br>또한, 사내 규정 위반일 수 있습니다."
+              body:"형식보다 실질이 중요합니다. 과도한 접대는 공정거래법상 부당 유인에 해당할 수 있고, 사내 규정 위반 소지가 큽니다."
             }
           }
         ]
@@ -304,20 +309,20 @@
       {
         meta: "에피소드 2 · 상황 2-2",
         media: "situation_ep2_2.png",
-        text: "거래처가 비싼 선물을 내민다. 법이나 회사 규정상 금지된 것인지 내 생각에는 좀 애매하다. {{name}}는 어떻게 하겠는가?",
+        text: "거래처가 비싼 선물을 내민다. 법이나 회사 규정상 금지된 것인지 애매하다. {{name}}는 어떻게 하겠는가?",
         choices: [
           { text:"받을 수 없음을 설명하고 거절한다.",
             correct:true,
             feedback:{
               title:"좋은 선택",
-              body:"규정 위반 위험이 있고, 불필요한 오해가 발생할 수 있습니다. "
+              body:"규정 위반 위험이 있고, 불필요한 이해충돌·오해를 유발합니다. 기록 후 상급자·컴플라이언스팀에 알리세요."
             }
           },
           { text:"일단 받고 나중에 생각한다.",
             correct:false,
             feedback:{
               title:"잘못된 선택",
-              body:"규정 위반 위험이 있고, 불필요한 오해가 발생할 수 있습니다. "
+              body:"수수 시점에 이미 리스크가 발생합니다. 사후 반환·보고로 해결되지 않을 수 있습니다."
             }
           }
         ]
@@ -331,14 +336,14 @@
             correct:true,
             feedback:{
               title:"좋은 선택",
-              body:"관행보다 원칙을 따르는 것이 Integrity입니다. 작은 편법이 쌓이면 결국 큰 신뢰 손실로 이어집니다."
+              body:"관행보다 원칙이 우선입니다. 작은 편법이 누적되면 큰 신뢰 손실로 이어집니다."
             }
           },
           { text:"분위기를 깨지 않으려 맞장구친다.",
             correct:false,
             feedback:{
               title:"잘못된 선택",
-              body:"이는 조직문화를 망치는 행동입니다. 작은 편법이 쌓이면 결국 큰 신뢰 손실로 이어집니다."
+              body:"부적절한 관행을 용인하면 조직문화가 악화됩니다."
             }
           }
         ]
@@ -349,7 +354,7 @@
   // EPISODE 3: 공정거래
   {
     title: "에피소드 3: 공정거래",
-    summaryMedia: "ep1_summary.png",
+    summaryMedia: "ep3_summary.png",
     situations: [
       {
         meta: "에피소드 3 · 상황 3-1",
@@ -360,14 +365,14 @@
             correct: true,
             feedback: {
               title:"좋은 선택",
-              body:"협력업체와 결과를 합의하게 되면 입찰담합·입찰방해 행위에 해당됩니다.<br><br>「독점규제 및 공정거래에 관한 법률」("공정거래법") 제19조 제1항 제8호 (부당한 공동행위)<br>- “입찰 또는 경매에 있어서 경쟁을 실질적으로 제한하는 행위”를 금지.<br>- 입찰담합 같은 경우가 전형적으로 여기에 해당.<br>- 사업자들이 서로 짜고 낙찰자를 정하거나 경쟁을 방해하는 행위는 바로 이 조항으로 제재."
+              body:"협력업체와 결과를 합의하면 입찰담합·입찰방해에 해당될 수 있습니다.<br><br>「독점규제 및 공정거래에 관한 법률」(공정거래법) 제19조 제1항 제8호(부당한 공동행위)<br>- 입찰 또는 경매에서 경쟁을 실질적으로 제한하는 행위를 금지합니다."
             }
           },
           { text: "심사위원 취향을 살짝 귀띔해 준다.",
             correct: false,
             feedback: {
               title:"잘못된 선택",
-              body:"입찰에서 특정업체에게 유리한 행동을 하면 입찰담합·입찰방해 행위에 해당됩니다.<br><br>「독점규제 및 공정거래에 관한 법률」("공정거래법") 제19조 제1항 제8호 (부당한 공동행위)<br>- “입찰 또는 경매에 있어서 경쟁을 실질적으로 제한하는 행위”를 금지.<br>- 입찰담합 같은 경우가 전형적으로 여기에 해당.<br>- 사업자들이 서로 짜고 낙찰자를 정하거나 경쟁을 방해하는 행위는 바로 이 조항으로 제재."
+              body:"특정 업체에 유리한 행동은 공정경쟁을 저해합니다.<br><br>공정거래법 제19조 제1항 제8호(부당한 공동행위) 위반 소지."
             }
           }
         ]
@@ -381,14 +386,14 @@
             correct: true,
             feedback:{ 
               title:"좋은 선택", 
-              body:"부당한 지시를 거절하고 절차를 따랐습니다. 「독점규제 및 공정거래에 관한 법률」("공정거래법")상 부당 지원행위 (제23조 제1항 제7호) 및 소속 기업에 재산상 손해를 입힐 가능성이 있어 「형법」상 업무상 배임죄 (제356조)에 해당할 수 있습니다. "
+              body:"부당한 지시를 거절하고 절차를 따랐습니다. 공정거래법상 부당 지원행위(제23조 제1항 제7호) 소지 및 회사에 재산상 손해를 입힐 경우 형법상 업무상 배임(제356조) 위험이 있습니다."
             }
           },
           { text: "일단 상사 뜻을 따른다.",
             correct:false,
             feedback:{ 
               title:"잘못된 선택", 
-              body:"이는 공정거래법 취지에 반합니다. 「독점규제 및 공정거래에 관한 법률」("공정거래법")상 부당 지원행위 (제23조 제1항 제7호) 및 소속 기업에 재산상 손해를 입힐 가능성이 있어 「형법」상 업무상 배임죄 (제356조)에 해당할 수 있습니다. "
+              body:"공정거래법 취지에 반합니다. 부당 지원행위(제23조 제1항 제7호) 및 업무상 배임(형법 제356조) 리스크가 발생합니다."
             }
           }
         ]
@@ -402,14 +407,14 @@
             correct: true,
             feedback:{ 
               title:"좋은 선택", 
-              body:"자본시장법 제174조는 미공개 중요정보 이용행위를 금지하는 규정입니다. 이는 투자자의 투자 판단에 중대한 영향을 미칠 수 있는 정보를 불특정 다수인이 알 수 있도록 공개되기 전에 해당 정보를 이용하여 주식 등을 매매하거나 그 정보로 이익을 얻는 행위를 막기 위한 것입니다."
+              body:"자본시장법 제174조는 미공개 중요정보 이용을 금지합니다. 공개 전 해당 정보를 이용한 매매·이익 취득은 시장 공정성을 해칩니다."
             }
           },
-          { text: "소액의 이익만 남기면 괜찮을테니 그 회사의 주식을 거래한다.",
+          { text: "소액의 이익만 남기면 괜찮으니 그 회사 주식을 거래한다.",
             correct:false,
             feedback:{ 
               title:"잘못된 선택", 
-              body:"자본시장법 제174조는 미공개 중요정보 이용행위를 금지하는 규정입니다. 이는 투자자의 투자 판단에 중대한 영향을 미칠 수 있는 정보를 불특정 다수인이 알 수 있도록 공개되기 전에 해당 정보를 이용하여 주식 등을 매매하거나 그 정보로 이익을 얻는 행위를 막기 위한 것입니다. 이는 시장의 신뢰를 해치는 비윤리적 행동입니다."
+              body:"금지 행위입니다(자본시장법 제174조). 규모와 무관하게 시장 신뢰를 훼손하는 비윤리적 행동입니다."
             }
           }
         ]
@@ -425,7 +430,7 @@
   function go(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
     $('#'+id).classList.remove('hidden');
-    window.scrollTo({top:0,behavior:'instant'});
+    window.scrollTo({ top: 0, behavior: 'auto' });
     renderNames();
   }
   function renderNames(){
@@ -476,7 +481,8 @@
     renderMediaInto('#situationMediaRight', sit.media, sit.meta);
     $('#sceneMeta').textContent = sit.meta || '';
     $('#episodeTitle').textContent = ep.title + ' — 상황 ' + (currentSituation+1);
-    $('#situationText').textContent = (sit.text||'').replaceAll('{{name}}', playerName);
+    // allow inline HTML like <br>, while escaping playerName only
+    $('#situationText').innerHTML = (sit.text||'').replaceAll('{{name}}', escapeHTML(playerName));
 
     // choices randomized
     const shuffled = [...sit.choices].sort(()=>Math.random()-0.5);
@@ -487,7 +493,9 @@
       btn.className = 'choice ' + colorClasses[idx % colorClasses.length];
       btn.textContent = choice.text;
       btn.onclick = () => showResult(choice);
-      btn.setAttribute('aria-label', (choice.correct?'정답 가능성 있음: ':'선택: ')+choice.text);
+      // Do NOT leak correctness in accessibility labels
+      btn.setAttribute('role','option');
+      btn.setAttribute('aria-label', '선택지');
       bowl.appendChild(btn);
     });
 
@@ -514,7 +522,7 @@
       epIndex: currentEpisode,
       epTitle: ep.title,
       meta: sit.meta,
-      question: sit.text.replaceAll('{{name}}', playerName),
+      question: (sit.text||'').replaceAll('{{name}}', playerName),
       picked: choice.text,
       correct: good
     });
@@ -522,7 +530,7 @@
     // UI
     $('#resultTitle').className = good ? 'good' : 'bad';
     $('#resultTitle').textContent = choice.feedback?.title || (good ? '좋은 선택' : '잘못된 선택');
-    $('#resultText').textContent = choice.feedback?.body || (good ? '바람직한 판단입니다.' : '다시 생각해 보세요.');
+    $('#resultText').innerHTML = choice.feedback?.body || (good ? '바람직한 판단입니다.' : '다시 생각해 보세요.');
 
     // result image
     const GOOD_MEDIA = ["good_choice.png","good_choice_alt1.png","good_choice_alt2.png"];
