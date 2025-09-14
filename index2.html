@@ -204,129 +204,219 @@
 
   // ---------- Data (3 episodes only) ----------
   const episodes = [
-    // EPISODE 1: 직장 내 괴롭힘 대응
-    {
-      title: "에피소드 1: 직장 내 괴롭힘 대응",
-      summaryMedia: "ep3_summary.png",
-      situations: [
-        {
-          meta: "에피소드 1 · 상황 1-1",
-          media: "situation_ep3_1.png",
-          text: "선배가 신입에게 욕설을 퍼붓는다. 모두가 시선을 피한다. {{name}}는?",
-          choices: [
-            { text:"명백한 괴롭힘이므로 즉시 제지한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"즉시 제지로 피해를 막았습니다.", warn:["인격 모독과 공개 망신은 명백히 괴롭힘입니다."]}},
-            { text:"침묵한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"방관은 괴롭힘을 지속시키는 요인이 됩니다.", warn:["방관·묵인해서는 안 됩니다."]}}
-          ]
-        },
-        {
-          meta: "에피소드 1 · 상황 1-2",
-          media: "situation_ep3_2.png",
-          text: "누군가의 다른 직원에 대한 괴롭힘이 너무 심하다. 회사에 보고하고 싶다. 그런데 제3자가 보고해도 조사를 해줄까, {{name}}?",
-          choices: [
-            { text:"보고해라. 분명히 조사해줄 것이다.", correct:true,
-              feedback:{title:"좋은 선택", body:"제76조의3에 따라 누구든지 직장 내 괴롭힘 사실을 신고할 수 있고, 사용자는 지체 없이 객관적으로 조사해야 합니다."}},
-            { text:"바뀌는 것도 없을 거라면 관여하지 말자.", correct:false,
-              feedback:{title:"잘못된 선택", body:"소극적 태도는 문제를 악화시킵니다. 제76조의3은 신고 및 조사 의무를 명시합니다."}}
-          ]
-        },
-        {
-          meta: "에피소드 1 · 상황 1-3",
-          media: "situation_ep3_3.png",
-          text: "단체 채팅방에서 특정 직원 조롱이 이어진다. {{name}}는?",
-          choices: [
-            { text:"중단을 요구하고 신고 경로 안내.", correct:true,
-              feedback:{title:"좋은 선택", body:"괴롭힘 방지에 기여했습니다.", warn:["집단 조롱 금지."]}},
-            { text:"괜히 나섰다가 불편해질까봐 침묵.", correct:false,
-              feedback:{title:"잘못된 선택", body:"침묵은 동조로 비칩니다.", warn:["방관 금지."]}}
-          ]
-        }
-      ]
-    },
+  // EPISODE 1: 직장 내 괴롭힘 대응
+  {
+    title: "에피소드 1: 직장 내 괴롭힘 대응",
+    summaryMedia: "ep3_summary.png",
+    situations: [
+      {
+        meta: "에피소드 1 · 상황 1-1",
+        media: "situation_ep3_1.png",
+        text: "선배가 신입에게 욕설을 퍼붓는다. 모두가 시선을 피한다. {{name}}는?",
+        choices: [
+          { text:"명백한 괴롭힘이므로 즉시 중단을 요구하고, 필요시 보고한다.",
+            correct:true,
+            feedback:{
+              title:"좋은 선택",
+              body:"직장 내 괴롭힘은 금지되고(근로기준법 제76조의2), 현장에서 중단 요청·보호 조치 유도·보고로 피해 확산을 막을 수 있습니다.",
+              warn:["인격 모독·공개 망신은 괴롭힘 유형에 해당할 수 있습니다."]
+            }
+          },
+          { text:"침묵한다.",
+            correct:false,
+            feedback:{
+              title:"잘못된 선택",
+              body:"방관은 문제를 지속·확대시킵니다. 안전이 우려되면 즉시 보고하세요.",
+              warn:["방관·묵인 금지."]
+            }
+          }
+        ]
+      },
+      {
+        meta: "에피소드 1 · 상황 1-2",
+        media: "situation_ep3_2.png",
+        text: "누군가의 다른 직원에 대한 괴롭힘이 너무 심하다. 회사에 보고하고 싶다. 그런데 제3자가 보고해도 조사를 해줄까, {{name}}?",
+        choices: [
+          { text:"보고해라. 누구든지 신고할 수 있고 사용자는 지체 없이 객관적으로 조사해야 한다.",
+            correct:true,
+            feedback:{
+              title:"좋은 선택",
+              body:"근로기준법 제76조의3에 따라 ‘누구든지’ 신고 가능하며, 사용자는 지체 없이 객관적으로 조사해야 합니다."
+            }
+          },
+          { text:"바뀌는 것도 없을 거라면 관여하지 말자.",
+            correct:false,
+            feedback:{
+              title:"잘못된 선택",
+              body:"소극적 태도는 피해를 키웁니다. 법은 신고와 조사 의무를 명시합니다(제76조의3)."
+            }
+          }
+        ]
+      },
+      {
+        meta: "에피소드 1 · 상황 1-3",
+        media: "situation_ep3_3.png",
+        text: "단체 채팅방에서 특정 직원 조롱이 이어진다. {{name}}는?",
+        choices: [
+          { text:"중단을 요구하고 신고·상담 경로를 안내한다.",
+            correct:true,
+            feedback:{
+              title:"좋은 선택",
+              body:"온라인 상의 반복적 조롱도 괴롭힘이 될 수 있습니다.",
+              warn:["집단 조롱 금지."]
+            }
+          },
+          { text:"괜히 나섰다가 불편해질까봐 침묵.",
+            correct:false,
+            feedback:{
+              title:"잘못된 선택",
+              body:"침묵은 동조로 비칠 수 있습니다.",
+              warn:["방관 금지."]
+            }
+          }
+        ]
+      }
+    ]
+  },
 
-    // EPISODE 2: Integrity
-    {
-      title: "에피소드 2: Integrity",
-      summaryMedia: "ep2_summary.png",
-      situations: [
-        {
-          meta: "에피소드 2 · 상황 2-1",
-          media: "situation_ep2_1.png",
-          text: "거래처가 비싼 곳으로 초대를 한다. “좋은 식당 예약했습니다.” ‘괜찮지 않나?’라는 생각이 든다, {{name}}.",
-          choices: [
-            { text:"회사 규정을 이유로 정중히 거절한다.", correct:true,
-              feedback:{title:"좋은 선택", body:"사적 이해 유발 소지를 차단했습니다.", warn:["향응/접대 수수 금지."]}},
-            { text:"공식 자리로 포장되었으니 참석한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"형식이 공적이어도 실질은 사적일 수 있습니다.", warn:["이해충돌 주의."]}}
-          ]
-        },
-        {
-          meta: "에피소드 2 · 상황 2-2",
-          media: "situation_ep2_2.png",
-          text: "거래처가 고급 포장 상자를 내민다. “작은 정성입니다, {{name}}님.”",
-          choices: [
-            { text:"받을 수 없음을 설명하고 돌려보낸다.", correct:true,
-              feedback:{title:"좋은 선택", body:"금품 수수 오해를 차단했습니다.", warn:["절차 준수."]}},
-            { text:"일단 받고 나중에 생각한다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"‘일단 수수’ 자체가 리스크입니다.", warn:["금지."]}}
-          ]
-        },
-        {
-          meta: "에피소드 2 · 상황 2-3",
-          media: "situation_ep2_3.png",
-          text: "지켜보던 동료가 나에게 말한다. “뭐 어때? 이 정도 선물은 다 받아.”, {{name}}.",
-          choices: [
-            { text:"작아도 쌓이면 문제, 원칙을 지킨다.", correct:true,
-              feedback:{title:"좋은 선택", body:"관행이라도 기준을 낮추지 않았습니다.", warn:["관행 묵인 금지."]}},
-            { text:"분위기를 깨지 않으려 맞장구친다.", correct:false,
-              feedback:{title:"잘못된 선택", body:"침묵·동조 누적은 큰 문제로 이어집니다.", warn:["묵시적 동조 금지."]}}
-          ]
-        }
-      ]
-    },
+  // EPISODE 2: Integrity
+  {
+    title: "에피소드 2: Integrity",
+    summaryMedia: "ep2_summary.png",
+    situations: [
+      {
+        meta: "에피소드 2 · 상황 2-1",
+        media: "situation_ep2_1.png",
+        text: "거래처가 비싼 곳으로 초대를 한다. “좋은 식당 예약했습니다.” ‘괜찮지 않나?’라는 생각이 든다, {{name}}.",
+        choices: [
+          { text:"회사 규정·부패방지정책을 근거로 정중히 거절한다.",
+            correct:true,
+            feedback:{
+              title:"좋은 선택",
+              body:"사적 이해 유발 소지를 차단했습니다. 민간기업 임직원은 회사 정책과 이해충돌 원칙을 우선 적용하세요.",
+              warn:["향응·접대 수수 금지(사내 규정/절차 준수)."]
+            }
+          },
+          { text:"공식 자리로 포장되었으니 참석한다.",
+            correct:false,
+            feedback:{
+              title:"잘못된 선택",
+              body:"형식이 공적이어도 실질이 사적 이익 제공이면 리스크입니다.",
+              warn:["이해충돌 주의."]
+            }
+          }
+        ]
+      },
+      {
+        meta: "에피소드 2 · 상황 2-2",
+        media: "situation_ep2_2.png",
+        text: "거래처가 고급 포장 상자를 내민다. “작은 정성입니다, {{name}}님.”",
+        choices: [
+          { text:"수령 불가 원칙을 설명하고 즉시 반환·등록한다(필요 시 클린신고).",
+            correct:true,
+            feedback:{
+              title:"좋은 선택",
+              body:"금품 수수 오해를 차단했습니다. 수령·보관·반환은 회사 규정 절차에 따르세요.",
+              warn:["수령 보류·보고·반환 기록."]
+            }
+          },
+          { text:"일단 받고 나중에 생각한다.",
+            correct:false,
+            feedback:{
+              title:"잘못된 선택",
+              body:"‘일단 수수’ 자체가 리스크입니다.",
+              warn:["금지."]
+            }
+          }
+        ]
+      },
+      {
+        meta: "에피소드 2 · 상황 2-3",
+        media: "situation_ep2_3.png",
+        text: "지켜보던 동료가 말한다. “뭐 어때? 이 정도 선물은 다 받아.”, {{name}}.",
+        choices: [
+          { text:"작아도 누적되면 문제, 원칙을 지킨다.",
+            correct:true,
+            feedback:{
+              title:"좋은 선택",
+              body:"관행이라도 기준을 낮추지 않았습니다.",
+              warn:["관행 묵인 금지."]
+            }
+          },
+          { text:"분위기를 깨지 않으려 맞장구친다.",
+            correct:false,
+            feedback:{
+              title:"잘못된 선택",
+              body:"침묵·동조의 누적은 큰 문제로 이어집니다.",
+              warn:["묵시적 동조 금지."]
+            }
+          }
+        ]
+      }
+    ]
+  },
 
-    // EPISODE 3: 공정거래 (입찰/내부정보)
-    {
-      title: "에피소드 3: 공정거래",
-      summaryMedia: "ep1_summary.png",
-      situations: [
-        {
-          meta: "에피소드 3 · 상황 3-1",
-          media: "situation_ep1_1.png",
-          text: "퇴근 무렵 협력업체 담당자가 부탁한다. “이번 입찰에서 꼭 우리 회사가 선정되게 도와주세요, {{name}}님.”",
-          choices: [
-            { text: "공고문 조건 외 영향 불가를 설명한다.", correct: true,
-              feedback: { title:"좋은 선택", body:"공정성과 투명성을 우선했습니다.", warn:["비공개 귀띔·편파 조언 제공은 안됩됩니다."] } },
-            { text: "심사위원 취향을 살짝 귀띔해 준다.", correct: false,
-              feedback: { title:"잘못된 선택", body:"사소해 보여도 공정성을 해칩니다.", warn:["편파된 결정 유도해서는 안된니다."] } }
-          ]
-        },
-        {
-          meta: "에피소드 3 · 상황 3-2",
-          media: "situation_ep1_2.png",
-          text: "상사가 말한다. “이번에는 ○○업체 밀어주자, {{name}}.”",
-          choices: [
-            { text: "평가 기준·절차 준수를 조심스레 제시한다.", correct: true,
-              feedback:{ title:"좋은 선택", body:"절차 준수는 신뢰를 높입니다.", warn:["부당 지시 수용 금지."]}},
-            { text: "일단 상사 뜻을 따른다.", correct:false,
-              feedback:{ title:"잘못된 선택", body:"묵인은 동조로 비칩니다.", warn:["편파 평가 금지."]}}
-          ]
-        },
-        {
-          meta: "에피소드 3 · 상황 3-3",
-          media: "situation_ep1_3.png",
-          text: "회사의 내부정보를 통해 곧 주가가 폭등할 것이라는 것을 알게 되었다. “이 정보를 활용하여 투자할까, {{name}}?”",
-          choices: [
-            { text: "이해관계를 회사에 보고한다.", correct: true,
-              feedback:{ title:"좋은 선택", body:"자본시장법 제174조는 내부자의 미공개 중요정보 이용 거래를 금지합니다."}},
-            { text: "알리지 않고 심사에 참여한다.", correct:false,
-              feedback:{ title:"잘못된 선택", body:"자본시장법 제174조는 내부자의 미공개 중요정보 이용 거래를 금지합니다."}}
-          ]
-        }
-      ]
-    }
-  ];
+  // EPISODE 3: 공정거래 (입찰/내부정보)
+  {
+    title: "에피소드 3: 공정거래",
+    summaryMedia: "ep1_summary.png",
+    situations: [
+      {
+        meta: "에피소드 3 · 상황 3-1",
+        media: "situation_ep1_1.png",
+        text: "퇴근 무렵 협력업체 담당자가 부탁한다. “이번 입찰에서 꼭 우리 회사가 선정되게 도와주세요, {{name}}님.”",
+        choices: [
+          { text: "공고문·평가기준 외 영향은 불가하다고 설명하고 동일 정보만 공정하게 제공한다.",
+            correct: true,
+            feedback: {
+              title:"좋은 선택",
+              body:"공정성과 투명성을 우선했습니다.",
+              warn:["비공개 귀띔·편파 조언 제공은 안 됩니다."]
+            }
+          },
+          { text: "심사위원 취향을 살짝 귀띔해 준다.",
+            correct: false,
+            feedback: {
+              title:"잘못된 선택",
+              body:"사소해 보여도 공정성을 훼손합니다.",
+              warn:["편파적 결정 유도는 안 됩니다."]
+            }
+          }
+        ]
+      },
+      {
+        meta: "에피소드 3 · 상황 3-2",
+        media: "situation_ep1_2.png",
+        text: "상사가 말한다. “이번에는 ○○업체 밀어주자, {{name}}.”",
+        choices: [
+          { text: "평가기준·절차 준수를 근거로 공정 평가를 제안한다(필요 시 컴플라이언스 상담).",
+            correct: true,
+            feedback:{ title:"좋은 선택", body:"절차 준수는 신뢰를 높입니다.", warn:["부당 지시 수용 금지."]}
+          },
+          { text: "일단 상사 뜻을 따른다.",
+            correct:false,
+            feedback:{ title:"잘못된 선택", body:"묵인은 동조로 비칩니다.", warn:["편파 평가 금지."]}
+          }
+        ]
+      },
+      {
+        meta: "에피소드 3 · 상황 3-3",
+        media: "situation_ep1_3.png",
+        text: "회사의 미공개 중요정보로 곧 주가에 중대한 영향이 있을 것을 알게 되었다. “이 정보를 활용하여 투자할까, {{name}}?”",
+        choices: [
+          { text: "미공개 중요정보는 거래에 ‘절대’ 사용하지 않는다. 보유주식은 거래중지(벽 쌓기) 및 내부보고·차단 절차를 따른다.",
+            correct: true,
+            feedback:{ title:"좋은 선택", body:"자본시장법 제174조는 내부자의 미공개 중요정보 이용 거래를 금지합니다. 보고는 ‘거래 금지’와 함께 진행되어야 합니다."}
+          },
+          { text: "알리지 않고 관련 의사결정·거래에 참여한다.",
+            correct:false,
+            feedback:{ title:"잘못된 선택", body:"자본시장법 제174조 위반 위험. 즉시 거래중지·보고·차단 절차를 따르세요."}
+          }
+        ]
+      }
+    ]
+  }
+];
 
   // ---------- Helpers ----------
   const $ = sel => document.querySelector(sel);
