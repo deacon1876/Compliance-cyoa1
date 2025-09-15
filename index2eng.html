@@ -144,7 +144,7 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
       <!-- course description -->
       <div class="courseDesc" style="margin:12px 0 16px;padding:12px 14px;border:1px solid rgba(148,163,184,.35);border-radius:10px;background:rgba(255,255,255,.04);color:#cbd5e1;">
         <h3 style="margin:0 0 6px 0;font-size:1rem">About This Course</h3>
-        <p style="margin:0">Realistic workplace scenarios covering three topics:</p>
+        <p style="margin:0">Possible workplace scenarios covering three topics:</p>
         <ul style="margin:8px 0 0 18px">
           <li>Episode 1 — Workplace Harassment Response</li>
           <li>Episode 2 — Integrity (Gifts & Hospitality)</li>
@@ -242,14 +242,14 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
             correct:true,
             feedback:{
               title:"Good choice",
-              body:"Company anti-harassment policy applies. If conduct is based on a protected characteristic, it may also violate U.S. Title VII (hostile work environment). Even if not unlawful, it's unacceptable and may breach the OSHA General Duty Clause to provide a safe workplace."
+              body:"Harassment is not allowed. It may violate relevant laws such as U.S. Title VII (hostile work environment), OSHA General Duty Clause to provide a safe workplace, etc."
             }
           },
           { text:"Stay silent.",
             correct:false,
             feedback:{
-              title:"Not the best",
-              body:"Silence enables harm. Report or escalate per policy (HR/Compliance). Speak up to protect colleagues and culture."
+              title:"Worse choice",
+              body:"Silence enables harm. Speak up to protect your colleagues. Harassment is not allowed. It may violate relevant laws such as U.S. Title VII (hostile work environment), OSHA General Duty Clause to provide a safe workplace, etc."
             }
           }
         ]
@@ -263,13 +263,13 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
             correct:true,
             feedback:{
               title:"Good choice",
-              body:"Most company policies allow any employee to report misconduct. Early reporting helps stop escalation and protects people."
+              body:"Early reporting helps stop escalation and protects people."
             }
           },
           { text:"Do nothing—it's not my team.",
             correct:false,
             feedback:{
-              title:"Not the best",
+              title:"Worse choice",
               body:"'Not my team' thinking leaves risk unchecked and contradicts our duty to ensure a respectful workplace."
             }
           }
@@ -284,13 +284,13 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
             correct:true,
             feedback:{
               title:"Good choice",
-              body:"Digital spaces are still the workplace. Shut it down, support the target, and report if needed."
+              body:"Digital spaces are still the workplace. Shut the harassment down, support the victim, and report if needed."
             }
           },
           { text:"Say nothing to avoid friction.",
             correct:false,
             feedback:{
-              title:"Not the best",
+              title:"Worse choice",
               body:"Avoidance normalizes misconduct and erodes trust."
             }
           }
@@ -309,7 +309,7 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
         media: "situation_ep2_1.png",
         text: "A supplier invites you to an upscale restaurant as part of a so-called \"official\" event. What should {{name}} do?",
         choices: [
-          { text:"Decline politely, citing company policy and anti-bribery rules.",
+          { text:"Check company policy and anti-bribery rules. Refuse if needed.",
             correct:true,
             feedback:{
               title:"Good choice",
@@ -319,7 +319,7 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
           { text:"Attend—it's labeled as an \"official\" function.",
             correct:false,
             feedback:{
-              title:"Not the best",
+              title:"Worse choice",
               body:"Labels don't change substance. If it could influence (or appear to influence) decisions, it's a problem."
             }
           }
@@ -330,18 +330,18 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
         media: "situation_ep2_2.png",
         text: "A partner offers an expensive gift. You're unsure if it's prohibited. What should {{name}} do?",
         choices: [
-          { text:"Explain you cannot accept and decline. Document and notify Compliance.",
+          { text:"Explain you cannot accept and decline. Dif needed, document the incident and notify relevant teams.",
             correct:true,
             feedback:{
               title:"Good choice",
-              body:"Accepting creates conflicts and appearance of impropriety. Follow policy: decline, record, and report."
+              body:"Accepting creates conflicts and appearance of impropriety. Follow policy if needed: decline, record, and report."
             }
           },
           { text:"Accept now, sort it out later.",
             correct:false,
             feedback:{
-              title:"Not the best",
-              body:"Risk begins at acceptance. Post-hoc fixes rarely undo perception or policy breaches."
+              title:"Worse choice",
+              body:"Make sure what the rules say right now. Risk begins at acceptance. Avoid breaching rules."
             }
           }
         ]
@@ -351,18 +351,18 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
         media: "situation_ep2_3.png",
         text: "A teammate says, \"Everyone takes small gifts—don't be so strict.\" What should {{name}} do?",
         choices: [
-          { text:"Hold the line—small perks add up and erode trust.",
+          { text:"Everybody may be wrong. Small risks pile up and erode trust.",
             correct:true,
             feedback:{
               title:"Good choice",
               body:"Culture is built by daily choices. Consistency prevents drift toward quid-pro-quo expectations."
             }
           },
-          { text:"Go along to keep the mood.",
+          { text:"Go along with the opinion of the crowd.",
             correct:false,
             feedback:{
-              title:"Not the best",
-              body:"Normalizing exceptions leads to bigger violations and reputational damage."
+              title:"Worse choice",
+              body:"The crowd may be wrong. Normalizing exceptions leads to bigger violations."
             }
           }
         ]
@@ -384,13 +384,13 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
             correct: true,
             feedback: {
               title:"Good choice",
-              body:"Agreeing outcomes or sharing non-public advantages can be bid-rigging or collusion, a felony under the U.S. Sherman Act §1. If it's a government tender, additional rules (e.g., Procurement Integrity Act) apply."
+              body:"Backroom dealing on outcomes of tenders or sharing non-public advantages can be bid-rigging or collusion."
             }
           },
           { text: "Quietly tip them off to a judge's preferences.",
             correct: false,
             feedback: {
-              title:"Not the best",
+              title:"Worse choice",
               body:"Tilting the field undermines competition and may constitute fraud, collusion, or procurement misconduct."
             }
           }
@@ -405,13 +405,13 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
             correct: true,
             feedback:{ 
               title:"Good choice", 
-              body:"Steering can violate antitrust/competition principles and internal controls, and expose the company (and you) to fraud or breach-of-duty claims. Escalate to Legal/Compliance if pressure continues."
+              body:"Steering can violate antitrust/competition principles and internal controls, and expose the company (and you) to fraud or breach-of-duty claims."
             }
           },
           { text: "Follow the directive without question.",
             correct:false,
             feedback:{ 
-              title:"Not the best", 
+              title:"Worse choice", 
               body:"Improper favoritism risks legal exposure (e.g., false statements, fraud, commercial bribery) and personal discipline."
             }
           }
@@ -426,13 +426,13 @@ Bigger text on primary/ghost buttons: .btn, .ghost { font-size: 1.125rem; }
             correct: true,
             feedback:{ 
               title:"Good choice", 
-              body:"Trading or tipping on MNPI violates U.S. securities laws (Exchange Act §10(b) and SEC Rule 10b-5). It undermines market integrity and can lead to civil and criminal penalties."
+              body:"Trading or tipping on MNPI violates securities laws. It undermines market integrity and can lead to civil and criminal penalties."
             }
           },
           { text: "Make a small, quick profit—who would notice?",
             correct:false,
             feedback:{ 
-              title:"Not the best", 
+              title:"Worse choice", 
               body:"Amount doesn’t matter. Intent and use of MNPI trigger liability and harm trust."
             }
           }
