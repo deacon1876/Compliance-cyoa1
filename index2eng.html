@@ -13,6 +13,11 @@
     font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
     overflow:hidden;
   }
+  /* Make form controls inherit the global font settings */
+button, input, select, textarea { font: inherit; }
+
+/* Ensure choice buttons render larger text */
+button.choice { font-size: 1.125rem; } /* ~16px */
   .hidden{display:none}
 
   /* Header */
